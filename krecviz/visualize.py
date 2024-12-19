@@ -122,9 +122,9 @@ def log_frame_data(frame: krec.KRecFrame, frame_idx: int) -> None:
 
 
 def visualize_krec(
-    krec_path: Path,
-    urdf_path: Path | None = None,
-    output_path: Path | None = None,
+    krec_path: Path | str,
+    urdf_path: Path | str | None = None,
+    output_path: Path | str | None = None,
 ) -> None:
     """Visualize a KREC recording with a URDF model using Rerun.
 
@@ -133,6 +133,11 @@ def visualize_krec(
         urdf_path: Path to the URDF file
         output_path: Optional path to save the visualization as .rrd file
     """
+    # Convert string paths to Path objects
+    krec_path = Path(krec_path) if isinstance(krec_path, str) else krec_path
+    urdf_path = Path(urdf_path) if isinstance(urdf_path, str) else urdf_path
+    output_path = Path(output_path) if isinstance(output_path, str) else output_path
+
     # Initialize Rerun
     if output_path:
         rr.init("urdf_basic_logging", spawn=False)
