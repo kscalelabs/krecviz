@@ -37,16 +37,21 @@ jobs:
           pip install cibuildwheel
         shell: bash
 
+      - name: Install Protoc
+        run: |
+          if [ "$RUNNER_OS" == "Linux" ]; then
+            curl -L https://github.com/protocolbuffers/protobuf/releases/download/v28.3/protoc-28.3-linux-x86_64.zip -o protoc.zip
+            unzip protoc.zip -d protoc
+            sudo mv protoc/bin/protoc /usr/local/bin/protoc
+            sudo mv protoc/include/google /usr/local/include/google
+          elif [ "$RUNNER_OS" == "macOS" ]; then
+            brew install protobuf
+          fi
+        shell: bash
+
       - name: Build package
         env:
           CIBW_SKIP: "pp* *-musllinux*"  # Skip PyPy and musllinux builds
-          CIBW_BEFORE_ALL_LINUX: |
-            curl -L https://github.com/protocolbuffers/protobuf/releases/download/v28.3/protoc-28.3-linux-x86_64.zip -o protoc.zip
-            unzip protoc.zip -d protoc
-            mv protoc/bin/protoc /usr/local/bin/protoc
-            mv protoc/include/google /usr/local/include/google
-          CIBW_BEFORE_ALL_MACOS: |
-            brew install protobuf
           CIBW_ARCHS_LINUX: auto aarch64 ppc64le s390x
           CIBW_QEMU: "true"
           CIBW_BEFORE_BUILD: |
@@ -56,6 +61,7 @@ jobs:
           CIBW_ENVIRONMENT: |
             PATH="/usr/local/bin:$HOME/.cargo/bin:$PATH"
             CARGO_NET_GIT_FETCH_WITH_CLI=true
+            PROTOC="/usr/local/bin/protoc"
         run: |
           cibuildwheel --output-dir dist
 
