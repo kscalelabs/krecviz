@@ -21,6 +21,8 @@ jobs:
   run-base-tests:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    env:
+      PROTOC_OPTS: "--experimental_allow_proto3_optional"
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
