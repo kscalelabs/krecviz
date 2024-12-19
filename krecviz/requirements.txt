@@ -1,2 +1,11 @@
-# requirements.txt
-
+krec @ git+https://github.com/kscalelabs/krec.git # temporary
+numpy
+scipy
+scipy-stubs
+Pillow
+types-Pillow
+rerun-sdk
+tqdm
+types-tqdm
+trimesh
+urdf_parser_py
