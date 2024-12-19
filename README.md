@@ -1,3 +1,2 @@
 # krecviz
-
-Welcome to the krecviz project!
+Visualisation utilities for krec files 
