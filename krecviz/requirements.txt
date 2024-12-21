@@ -1,4 +1,4 @@
-krec @ git+https://github.com/kscalelabs/krec.git # temporary
+krec
 numpy
 scipy
 scipy-stubs
