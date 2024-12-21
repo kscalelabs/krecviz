@@ -4,6 +4,10 @@ Visualisation utilities for krec files
 ![image](https://github.com/user-attachments/assets/9d53e560-f6d4-42d0-a5df-b6ef6aa26ab2)
 
 
+
+https://github.com/user-attachments/assets/0441c859-ab77-4eec-9b76-083b52f077e9
+
+
 ## Installation
 
 ```bash
