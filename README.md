@@ -30,10 +30,10 @@ CLI usage:
 ```bash
 # cd to the repo root
 cd krecviz
+
 python -m krecviz.visualize \
-    --urdf data/urdf_examples/gpr/robot.urdf \
-    --krec data/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec \
-    --output output.rrd
+    --urdf ../tests/assets/urdf_examples/gpr/robot.urdf \
+    --krec ../tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
 ```
 
 Python API usage:
