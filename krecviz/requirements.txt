@@ -1,11 +1,13 @@
+# requirements.txt
+
+# Data serialization
 krec
 numpy
 scipy
-scipy-stubs
 Pillow
-types-Pillow
-rerun-sdk
 tqdm
-types-tqdm
+
+# Visualization
+rerun-sdk
 trimesh
 urdf_parser_py
