@@ -101,7 +101,7 @@ def update_robot_pose(
             joint_name,
             full_path,
             float(state.position),  # angle in degrees
-            angle,                  # angle in radians
+            angle,  # angle in radians
             translation,
             base_rotation,
             new_rotation,

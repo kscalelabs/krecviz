@@ -1,5 +1,15 @@
+# requirements-dev.txt
+
+# Linting
 black
 darglint
 mypy
-pytest
 ruff
+
+# Testing
+pytest
+
+# Types
+scipy-stubs
+types-Pillow
+types-tqdm
