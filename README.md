@@ -3,12 +3,11 @@ Visualisation utilities for krec files
 
 ![image](https://github.com/user-attachments/assets/9d53e560-f6d4-42d0-a5df-b6ef6aa26ab2)
 
-
-
 https://github.com/user-attachments/assets/0441c859-ab77-4eec-9b76-083b52f077e9
 
-
 ## Installation
+
+### Python
 
 ```bash
 pip install git+https://github.com/kscalelabs/krecviz.git
@@ -16,12 +15,15 @@ pip install git+https://github.com/kscalelabs/krecviz.git
 pip install -e .
 ```
 
+### Rust
+
+You should make sure you have 
+
 ## Usage
 
 NOTE: For now, in the rerun viwer, make sure to select "log tick" as the time unit. will fx this soon
 
 ![image](https://github.com/user-attachments/assets/360e1e22-3dbf-4382-b21e-da85174f9206)
-
 
 CLI usage:
 
