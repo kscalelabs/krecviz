@@ -81,7 +81,6 @@ def update_robot_pose(
             angle_rad = np.deg2rad(float(state.position))
             joint_angles[joint_name] = angle_rad
 
-    # Update each joint's transform
     for joint_name, angle in joint_angles.items():
         if joint_name not in joint_name_to_entity_path:
             logging.warning("No entity path found for joint %s", joint_name)
@@ -92,13 +91,21 @@ def update_robot_pose(
             logging.warning("Transform not found for path %s", full_path)
             continue
 
-        # Get initial transform and rotation axis
         translation, base_rotation = entity_to_transform[full_path]
-        axis = np.array([0, 0, 1])
-
-        # Compute new rotation (angle is already in radians)
+        axis = np.array([0, 0, 1])  # We assume rotation around Z-axis
         rot_mat = Rotation.from_rotvec(axis * angle).as_matrix()
         new_rotation = base_rotation @ rot_mat
+
+        # Debug-print the updated transform
+        debug_print_joint_update(
+            joint_name,
+            full_path,
+            float(state.position),  # angle in degrees
+            angle,                  # angle in radians
+            translation,
+            base_rotation,
+            new_rotation,
+        )
 
         # Log updated transform
         rr.log(
@@ -155,6 +162,8 @@ def visualize_krec(
         for joint in urdf_logger.urdf.joints:
             entity_path = urdf_logger.joint_entity_path(joint)
             joint_name_to_entity_path[joint.name] = entity_path
+    else:
+        raise RuntimeError("No URDF path provided!")
 
     # Load KREC file
     krec_data = load_krec(krec_path)
@@ -204,6 +213,34 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO)
 
     visualize_krec(args.krec, args.urdf, args.output)
+
+
+def debug_print_joint_update(
+    joint_name: str,
+    entity_path: str,
+    angle_deg: float,
+    angle_rad: float,
+    translation: list[float],
+    base_rotation: list[list[float]],
+    new_rotation: np.ndarray,
+) -> None:
+    """
+    Print debug information when a joint transform is updated.
+    Mimics the style of the Rust debug-print helper.
+    """
+    logging.info(
+        "Updating joint '%s' => entity_path='%s'",
+        joint_name,
+        entity_path,
+    )
+    logging.info(
+        "  angle_deg=%.3f => angle_rad=%.3f",
+        angle_deg,
+        angle_rad,
+    )
+    logging.info("  translation=%s", translation)
+    logging.info("  base_rotation=%s", np.array(base_rotation))
+    logging.info("  new_rotation=%s", new_rotation)
 
 
 if __name__ == "__main__":
