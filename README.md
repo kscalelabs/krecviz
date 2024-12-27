@@ -1,5 +1,5 @@
 # krecviz
-Visualisation utilities for krec files 
+Visualisation utilities for krec files
 
 ![image](https://github.com/user-attachments/assets/9d53e560-f6d4-42d0-a5df-b6ef6aa26ab2)
 
@@ -28,7 +28,10 @@ CLI usage:
 ```bash
 # cd to the repo root
 cd krecviz
-python visualize.py --urdf data/urdf_examples/gpr/robot.urdf --krec data/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec --output output.rrd
+python -m krecviz.visualize \
+    --urdf data/urdf_examples/gpr/robot.urdf \
+    --krec data/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec \
+    --output output.rrd
 ```
 
 Python API usage:
@@ -41,4 +44,3 @@ krecviz.viz(
     urdf_path="path/to/robot.urdf"
 )
 ```
-

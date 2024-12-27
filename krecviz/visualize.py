@@ -101,7 +101,7 @@ def update_robot_pose(
             joint_name,
             full_path,
             float(state.position),  # angle in degrees
-            angle,                  # angle in radians
+            angle,  # angle in radians
             translation,
             base_rotation,
             new_rotation,
@@ -224,20 +224,21 @@ def debug_print_joint_update(
     base_rotation: list[list[float]],
     new_rotation: np.ndarray,
 ) -> None:
-    """
-    Print debug information when a joint transform is updated.
+    """Print debug information when a joint transform is updated.
+
     Mimics the style of the Rust debug-print helper.
+
+    Args:
+        joint_name: Name of the joint in the URDF.
+        entity_path: Full path to the entity in the Rerun viewer.
+        angle_deg: Angle in degrees.
+        angle_rad: Angle in radians.
+        translation: 3D translation vector.
+        base_rotation: Base rotation matrix.
+        new_rotation: Updated rotation matrix
     """
-    logging.info(
-        "Updating joint '%s' => entity_path='%s'",
-        joint_name,
-        entity_path,
-    )
-    logging.info(
-        "  angle_deg=%.3f => angle_rad=%.3f",
-        angle_deg,
-        angle_rad,
-    )
+    logging.info("Updating joint '%s' => entity_path='%s'", joint_name, entity_path)
+    logging.info("  angle_deg=%.3f => angle_rad=%.3f", angle_deg, angle_rad)
     logging.info("  translation=%s", translation)
     logging.info("  base_rotation=%s", np.array(base_rotation))
     logging.info("  new_rotation=%s", new_rotation)

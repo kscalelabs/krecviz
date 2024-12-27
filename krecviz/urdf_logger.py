@@ -14,18 +14,15 @@ from pathlib import Path
 
 import numpy as np
 import rerun as rr
-import scipy.spatial.transform as st
 import trimesh
 from PIL import Image
 from urdf_parser_py import urdf as urdf_parser  # type: ignore[import-untyped]
 
-
 # Separate debug-print functions.
 
+
 def debug_print_log_view_coordinates(entity_path_val: str, entity_val: rr.ViewCoordinates, timeless_val: bool) -> None:
-    """
-    Print debug info before calling rr.log(...) for the root view coordinates.
-    """
+    """Print debug info before calling rr.log(...) for the root view coordinates."""
     print("======================")
     print("rerun_log")
     print(f"entity_path = self.add_entity_path_prefix(\"\") with value '{entity_path_val}'")
@@ -33,13 +30,13 @@ def debug_print_log_view_coordinates(entity_path_val: str, entity_val: rr.ViewCo
     print(f"timeless = {timeless_val}")
 
 
-def debug_print_log_joint(entity_path_w_prefix: str,
-                          joint: urdf_parser.Joint,
-                          translation: list[float] | None,
-                          rotation: list[list[float]] | None) -> None:
-    """
-    Print debug info before logging the Transform3D of a joint.
-    """
+def debug_print_log_joint(
+    entity_path_w_prefix: str,
+    joint: urdf_parser.Joint,
+    translation: list[float] | None,
+    rotation: list[list[float]] | None,
+) -> None:
+    """Print debug info before logging the Transform3D of a joint."""
     print("======================")
     print("rerun_log")
     print(f"entity_path = entity_path_w_prefix with value '{entity_path_w_prefix}'")
@@ -60,22 +57,17 @@ def debug_print_log_joint(entity_path_w_prefix: str,
 
 
 def debug_print_unsupported_geometry(entity_path_val: str, log_text: str) -> None:
-    """
-    Print debug info for the 'Unsupported geometry' case before logging rr.TextLog.
-    """
+    """Print debug info for the 'Unsupported geometry' case before logging rr.TextLog."""
     print("======================")
     print("rerun_log")
     print(f"entity_path = self.add_entity_path_prefix(\"\") with value '{entity_path_val}'")
     print(f"entity = rr.TextLog(...) with value '{log_text}'")
 
 
-def debug_print_log_trimesh(entity_path: str,
-                            mesh3d_entity: rr.Mesh3D,
-                            timeless_val: bool,
-                            mesh: trimesh.Trimesh) -> None:
-    """
-    Print debug info prior to rr.log(...) a single Trimesh.
-    """
+def debug_print_log_trimesh(
+    entity_path: str, mesh3d_entity: rr.Mesh3D, timeless_val: bool, mesh: trimesh.Trimesh
+) -> None:
+    """Print debug info prior to rr.log(...) a single Trimesh."""
     print("======================")
     print("rerun_log log_trimesh")
     print(f"entity_path = entity_path with value '{entity_path}'")
@@ -90,12 +82,8 @@ def debug_print_log_trimesh(entity_path: str,
     print(f"timeless = {timeless_val}")
 
 
-def debug_print_final_link_transform(link_name: str,
-                                     chain: list[str],
-                                     final_tf: np.ndarray) -> None:
-    """
-    Print the final transform accumulated for a link.
-    """
+def debug_print_final_link_transform(link_name: str, chain: list[str], final_tf: np.ndarray) -> None:
+    """Print the final transform accumulated for a link."""
     print(f"Link '{link_name}': BFS chain = {chain}")
     print("  => final_tf (4x4) =")
     for row in final_tf:
@@ -107,8 +95,7 @@ def debug_print_final_link_transform(link_name: str,
 # We now have a small custom Euler-to-matrix function that is logically equivalent
 # to the old `st.Rotation.from_euler("xyz", rpy).as_matrix()`.
 def rotation_from_euler_xyz(rpy):
-    """
-    Given a 3-element list/tuple [rx, ry, rz] of Euler angles in radians,
+    """Given a 3-element list/tuple [rx, ry, rz] of Euler angles in radians,
     build the corresponding 3x3 rotation matrix for an 'XYZ' rotation sequence.
     """
     rx, ry, rz = rpy
@@ -117,21 +104,30 @@ def rotation_from_euler_xyz(rpy):
     cy, sy = math.cos(ry), math.sin(ry)
     cz, sz = math.cos(rz), math.sin(rz)
 
-    R_x = np.array([
-        [1,  0,   0],
-        [0,  cx, -sx],
-        [0,  sx,  cx],
-    ], dtype=np.float64)
-    R_y = np.array([
-        [ cy,  0, sy],
-        [  0,  1,  0],
-        [-sy,  0, cy],
-    ], dtype=np.float64)
-    R_z = np.array([
-        [ cz, -sz,  0],
-        [ sz,  cz,  0],
-        [  0,   0,  1],
-    ], dtype=np.float64)
+    R_x = np.array(
+        [
+            [1, 0, 0],
+            [0, cx, -sx],
+            [0, sx, cx],
+        ],
+        dtype=np.float64,
+    )
+    R_y = np.array(
+        [
+            [cy, 0, sy],
+            [0, 1, 0],
+            [-sy, 0, cy],
+        ],
+        dtype=np.float64,
+    )
+    R_z = np.array(
+        [
+            [cz, -sz, 0],
+            [sz, cz, 0],
+            [0, 0, 1],
+        ],
+        dtype=np.float64,
+    )
 
     # Final rotation = Rz @ Ry @ Rx
     return R_z @ R_y @ R_x
@@ -307,7 +303,7 @@ class URDFLogger:
         if path.startswith("package://"):
             raise ValueError(f"Could not resolve '{path}'. Provide a direct or relative path.")
         elif path.startswith("file://"):
-            resolved = path[len("file://"):]
+            resolved = path[len("file://") :]
             return Path(resolved).resolve()
         else:
             direct_path = (self.urdf_dir / path).resolve()
@@ -322,8 +318,7 @@ class URDFLogger:
             )
 
     def print_final_link_transforms(self) -> None:
-        """
-        Debug function: for each link, accumulate the joint transforms from root -> link,
+        """Debug function: for each link, accumulate the joint transforms from root -> link,
         then print the resulting final 4x4.
         """
         root_link = self.urdf.get_root()
