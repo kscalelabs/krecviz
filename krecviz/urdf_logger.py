@@ -20,7 +20,9 @@ from urdf_parser_py import urdf as urdf_parser  # type: ignore[import-untyped]
 
 
 # Separate debug-print functions.
-def debug_print_log_view_coordinates(entity_path_val: str, entity_val: rr.ViewCoordinates, timeless_val: bool) -> None:
+def debug_print_log_view_coordinates(
+    entity_path_val: str, entity_val: rr.components.view_coordinates.ViewCoordinates, timeless_val: bool
+) -> None:
     """Print debug info before calling rr.log(...) for the root view coordinates."""
     print("======================")
     print("rerun_log")
@@ -339,7 +341,7 @@ class URDFLogger:
                 continue
 
             chain = self.urdf.get_chain(root_link, link.name)
-            final_tf = np.eye(4)
+            final_tf = np.eye(4, dtype=np.float64)
             for i in range(1, len(chain), 2):
                 joint_name = chain[i]
                 j = None
@@ -354,14 +356,12 @@ class URDFLogger:
                 xyz = j.origin.xyz if j.origin and j.origin.xyz else [0, 0, 0]
                 rpy = j.origin.rpy if j.origin and j.origin.rpy else [0, 0, 0]
                 local_rot = rotation_from_euler_xyz(rpy)
-                local_tf = np.eye(4)
+                local_tf = np.eye(4, dtype=np.float64)
                 local_tf[:3, :3] = local_rot
                 local_tf[:3, 3] = xyz
 
-                final_tf = final_tf @ local_tf
+                final_tf = np.array(final_tf @ local_tf, dtype=np.float64)
 
-            # --- CHANGED ---
-            # We extracted the actual print statement into a helper function:
             debug_print_final_link_transform(link.name, chain, final_tf)
 
 

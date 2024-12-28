@@ -78,7 +78,7 @@ def update_robot_pose(
         if state.actuator_id in actuator_to_urdf_joint and state.position is not None:
             joint_name = actuator_to_urdf_joint[state.actuator_id]
             # Convert degrees to radians
-            angle_rad = np.deg2rad(float(state.position))
+            angle_rad = np.deg2rad(state.position)
             joint_angles[joint_name] = angle_rad
 
     for joint_name, angle in joint_angles.items():
@@ -100,7 +100,7 @@ def update_robot_pose(
         debug_print_joint_update(
             joint_name,
             full_path,
-            float(state.position),  # angle in degrees
+            np.rad2deg(angle),  # angle in degrees
             angle,  # angle in radians
             translation,
             base_rotation,
