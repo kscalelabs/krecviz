@@ -224,8 +224,8 @@ def debug_print_joint_update(
     base_rotation: list[list[float]],
     new_rotation: np.ndarray,
 ) -> None:
-    """
-    Print debug information when a joint transform is updated.
+    """Print debug information when a joint transform is updated.
+
     Mimics the style of the Rust debug-print helper.
     """
     logging.info(
