@@ -186,7 +186,7 @@ class URDFLogger:
         rr.log(
             entity_path=entity_path_val,
             entity=entity_val,
-            timeless=timeless_val,
+            static=timeless_val,
         )
 
         # Now log joints
@@ -438,7 +438,7 @@ def log_trimesh(entity_path: str, mesh: trimesh.Trimesh) -> None:
     rr.log(
         entity_path=entity_path,
         entity=mesh3d_entity,
-        timeless=timeless_val,
+        static=timeless_val,
     )
 
 
