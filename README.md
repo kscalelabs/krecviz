@@ -17,13 +17,32 @@ pip install -e .
 
 ### Rust
 
-You should make sure you have 
+#### Install Protocol Buffers
+
+First, make sure you have protobufs installed for the krec dependency. Follow these commands to install it:
+
+```bash
+cd /tmp
+wget https://github.com/protocolbuffers/protobuf/releases/download/v28.3/protoc-28.3-linux-x86_64.zip
+unzip protoc-28.3-linux-x86_64.zip
+sudo cp bin/protoc /usr/local/bin/protoc
+``` 
+
+#### Build the krecviz Rust library
+
+```bash
+# cd to the repo root
+cd krecviz_rust
+cargo build
+```
 
 ## Usage
 
 NOTE: For now, in the rerun viwer, make sure to select "log tick" as the time unit. will fx this soon
 
 ![image](https://github.com/user-attachments/assets/360e1e22-3dbf-4382-b21e-da85174f9206)
+
+### Python
 
 CLI usage:
 
@@ -45,4 +64,14 @@ krecviz.viz(
     krec_path="path/to/recording.krec",
     urdf_path="path/to/robot.urdf"
 )
+```
+
+### Rust
+
+```bash
+# cd to the repo root
+cd krecviz_rust
+cargo run -- \
+    --urdf ../tests/assets/urdf_examples/gpr/robot.urdf \
+    --krec ../tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
 ```
