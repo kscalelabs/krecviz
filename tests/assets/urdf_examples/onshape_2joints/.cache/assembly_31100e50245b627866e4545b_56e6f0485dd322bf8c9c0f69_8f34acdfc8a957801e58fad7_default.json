@@ -1,0 +1,274 @@
+{
+  "rootAssembly": {
+    "occurrences": [
+      {
+        "hidden": false,
+        "fixed": false,
+        "transform": [
+          0.9999999999999991,
+          -3.920449248561401e-8,
+          7.88805605720064e-9,
+          -0.04327998597366106,
+          3.920449248473007e-8,
+          0.9999999999999991,
+          1.152994667104662e-10,
+          0.06489922157316012,
+          -7.888056061593948e-9,
+          -1.1529916614852095e-10,
+          0.9999999999999999,
+          0.05576925080232481,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "path": [
+          "M0cwSeGwIErhHFMzF"
+        ]
+      },
+      {
+        "hidden": false,
+        "fixed": false,
+        "transform": [
+          0.9999999999999993,
+          -3.9204492485614024e-8,
+          7.88805605720066e-9,
+          -0.01330564716612128,
+          3.920449248473008e-8,
+          0.9999999999999993,
+          1.1529946671045958e-10,
+          0.06489922274828887,
+          -7.888056061593955e-9,
+          -1.1529916614851764e-10,
+          1.0000000000000002,
+          0.05576925056588554,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "path": [
+          "MUWdgjFhzW/HcLv9Q"
+        ]
+      },
+      {
+        "hidden": false,
+        "fixed": false,
+        "transform": [
+          0.9999999999999992,
+          -3.920449248561402e-8,
+          7.888056057200657e-9,
+          -0.07325432478120082,
+          3.920449248473008e-8,
+          0.9999999999999992,
+          1.1529946671045958e-10,
+          0.06489922039803138,
+          -7.888056061593952e-9,
+          -1.1529916614851764e-10,
+          1.0,
+          0.05576925103876407,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "path": [
+          "MYvKVvF9J+3wAp5dg"
+        ]
+      }
+    ],
+    "instances": [
+      {
+        "name": "Part 1 <1>",
+        "suppressed": false,
+        "id": "MYvKVvF9J+3wAp5dg",
+        "fullConfiguration": "default",
+        "configuration": "default",
+        "documentMicroversion": "6a42806658b5e4841ca00343",
+        "documentId": "31100e50245b627866e4545b",
+        "elementId": "cd39e835fdb0431b538d1d20",
+        "type": "Part",
+        "isStandardContent": false,
+        "partId": "JHD"
+      },
+      {
+        "name": "Part 1 <2>",
+        "suppressed": false,
+        "id": "M0cwSeGwIErhHFMzF",
+        "fullConfiguration": "default",
+        "configuration": "default",
+        "documentMicroversion": "6a42806658b5e4841ca00343",
+        "documentId": "31100e50245b627866e4545b",
+        "elementId": "cd39e835fdb0431b538d1d20",
+        "type": "Part",
+        "isStandardContent": false,
+        "partId": "JHD"
+      },
+      {
+        "name": "Part 1 <3>",
+        "suppressed": false,
+        "id": "MUWdgjFhzW/HcLv9Q",
+        "fullConfiguration": "default",
+        "configuration": "default",
+        "documentMicroversion": "6a42806658b5e4841ca00343",
+        "documentId": "31100e50245b627866e4545b",
+        "elementId": "cd39e835fdb0431b538d1d20",
+        "type": "Part",
+        "isStandardContent": false,
+        "partId": "JHD"
+      }
+    ],
+    "patterns": [],
+    "features": [
+      {
+        "id": "MkN4Sz7XE+6FEdA7C",
+        "suppressed": false,
+        "featureType": "mate",
+        "featureData": {
+          "mateType": "REVOLUTE",
+          "matedEntities": [
+            {
+              "matedOccurrence": [
+                "MYvKVvF9J+3wAp5dg"
+              ],
+              "matedCS": {
+                "xAxis": [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                "yAxis": [
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "zAxis": [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                "origin": [
+                  -0.01667325132358417,
+                  0.012931371186389984,
+                  0.012500000000000002
+                ]
+              }
+            },
+            {
+              "matedOccurrence": [
+                "M0cwSeGwIErhHFMzF"
+              ],
+              "matedCS": {
+                "xAxis": [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                "yAxis": [
+                  0.0,
+                  -0.0,
+                  1.0
+                ],
+                "zAxis": [
+                  1.0,
+                  -0.0,
+                  -0.0
+                ],
+                "origin": [
+                  -0.046647590131123975,
+                  0.012931371186389984,
+                  0.012500000000000002
+                ]
+              }
+            }
+          ],
+          "name": "Revolute 1"
+        }
+      },
+      {
+        "id": "M4fZx92vuvlu8i8Fl",
+        "suppressed": false,
+        "featureType": "mate",
+        "featureData": {
+          "mateType": "REVOLUTE",
+          "matedEntities": [
+            {
+              "matedOccurrence": [
+                "M0cwSeGwIErhHFMzF"
+              ],
+              "matedCS": {
+                "xAxis": [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                "yAxis": [
+                  0.0,
+                  0.0,
+                  1.0
+                ],
+                "zAxis": [
+                  1.0,
+                  0.0,
+                  0.0
+                ],
+                "origin": [
+                  -0.01667325132358417,
+                  0.012931371186389984,
+                  0.012500000000000002
+                ]
+              }
+            },
+            {
+              "matedOccurrence": [
+                "MUWdgjFhzW/HcLv9Q"
+              ],
+              "matedCS": {
+                "xAxis": [
+                  0.0,
+                  1.0,
+                  0.0
+                ],
+                "yAxis": [
+                  0.0,
+                  -0.0,
+                  1.0
+                ],
+                "zAxis": [
+                  1.0,
+                  -0.0,
+                  -0.0
+                ],
+                "origin": [
+                  -0.046647590131123975,
+                  0.012931371186389984,
+                  0.012500000000000002
+                ]
+              }
+            }
+          ],
+          "name": "Revolute 2"
+        }
+      }
+    ],
+    "fullConfiguration": "default",
+    "configuration": "default",
+    "documentMicroversion": "6a42806658b5e4841ca00343",
+    "documentId": "31100e50245b627866e4545b",
+    "elementId": "8f34acdfc8a957801e58fad7"
+  },
+  "subAssemblies": [],
+  "parts": [
+    {
+      "isStandardContent": false,
+      "partId": "JHD",
+      "bodyType": "solid",
+      "fullConfiguration": "default",
+      "configuration": "default",
+      "documentMicroversion": "6a42806658b5e4841ca00343",
+      "documentId": "31100e50245b627866e4545b",
+      "elementId": "cd39e835fdb0431b538d1d20"
+    }
+  ],
+  "partStudioFeatures": []
+}

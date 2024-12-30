@@ -1,0 +1,95 @@
+<?xml version="1.0" ?>
+<robot name="assembly_1">
+  <link name="base">
+    <inertial>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <mass value="0.001"/>
+      <inertia ixx="0.000001" ixy="0" ixz="0" iyy="0.000001" iyz="0" izz="0.000001"/>
+    </inertial>
+  </link>
+  <joint name="floating_base" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="base"/>
+    <child link="Part_1"/>
+  </joint>
+  <link name="Part_1">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/Part_1.stl"/>
+      </geometry>
+      <material name="Part_1_material">
+        <color rgba="0.61568627 0.81176471 0.92941176 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/Part_1.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.020388249"/>
+      <inertia ixx="2.1983314e-06" iyy="2.5883919e-06" izz="2.6629473e-06" ixy="0" ixz="0" iyz="0"/>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+    </inertial>
+  </link>
+  <joint name="Revolute_1" type="revolute">
+    <origin xyz="-0.014987169 0 0" rpy="1.57 0 01.57"/>
+    <parent link="Part_1"/>
+    <child link="Part_1_2"/>
+    <limit effort="80" velocity="5" lower="-1.5707963" upper="1.5707963"/>
+    <axis xyz="0 0 1"/>
+  </joint>
+  <link name="Part_1_2">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/Part_1_2.stl"/>
+      </geometry>
+      <material name="Part_1_material_2">
+        <color rgba="0.61568627 0.81176471 0.92941176 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/Part_1_2.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.020388249"/>
+      <inertia ixx="2.5883919e-06" iyy="2.6629473e-06" izz="2.1983314e-06" ixy="0" ixz="0" iyz="0"/>
+      <origin xyz="0 0 -0.014987169" rpy="0 0 0"/>
+    </inertial>
+  </link>
+  <joint name="Revolute_2" type="revolute">
+    <origin xyz="0.014987169 0 0" rpy="1.5707963 0 1.5707963"/>
+    <parent link="Part_1"/>
+    <child link="Part_1_3"/>
+    <limit effort="80" velocity="5" lower="-1.5707963" upper="1.5707963"/>
+    <axis xyz="0 0 -1"/>
+  </joint>
+  <link name="Part_1_3">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/Part_1_3.stl"/>
+      </geometry>
+      <material name="Part_1_material_3">
+        <color rgba="0.61568627 0.81176471 0.92941176 1"/>
+      </material>
+    </visual>
+    <collision>
+      <origin xyz="0 0 0" rpy="0 0 0"/>
+      <geometry>
+        <mesh filename="meshes/Part_1_3.stl"/>
+      </geometry>
+    </collision>
+    <inertial>
+      <mass value="0.020388249"/>
+      <inertia ixx="2.5883919e-06" iyy="2.6629473e-06" izz="2.1983314e-06" ixy="0" ixz="0" iyz="0"/>
+      <origin xyz="0 0 0.014987169" rpy="0 0 0"/>
+    </inertial>
+  </link>
+</robot>

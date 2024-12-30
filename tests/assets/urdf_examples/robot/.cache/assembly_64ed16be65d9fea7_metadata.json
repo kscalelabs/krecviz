@@ -1,0 +1,117 @@
+{
+  "jsonType": "metadata-element",
+  "elementType": 1,
+  "mimeType": "onshape/assembly",
+  "elementId": "8f34acdfc8a957801e58fad7",
+  "properties": [
+    {
+      "name": "Name",
+      "value": "Assembly 1"
+    },
+    {
+      "name": "Description",
+      "value": null
+    },
+    {
+      "name": "Category",
+      "value": [
+        {
+          "memberCategories": [
+            {
+              "defaultObjectType": 3,
+              "objectTypes": [
+                3
+              ],
+              "ownerType": 2,
+              "description": "Category created by upgrade",
+              "ownerId": "556f3109e4b00b3fee9a3f4a",
+              "publishState": 1,
+              "name": "Onshape Assembly",
+              "id": "5877a03ebe4c21163b49dce3",
+              "href": null
+            }
+          ],
+          "memberCategoryIds": [
+            "5877a03ebe4c21163b49dce3"
+          ],
+          "defaultObjectType": 3,
+          "objectTypes": [
+            3
+          ],
+          "ownerType": 1,
+          "description": "Default category for object type Assembly",
+          "ownerId": "65a33ca766b95a21beacf364",
+          "publishState": 1,
+          "name": "Assembly",
+          "id": "65a33ca866b95a21beacf390",
+          "href": null
+        }
+      ]
+    },
+    {
+      "name": "Part number",
+      "value": null
+    },
+    {
+      "name": "Revision",
+      "value": null
+    },
+    {
+      "name": "State",
+      "value": "0"
+    },
+    {
+      "name": "Vendor",
+      "value": null
+    },
+    {
+      "name": "Project",
+      "value": null
+    },
+    {
+      "name": "Product line",
+      "value": null
+    },
+    {
+      "name": "Title 1",
+      "value": null
+    },
+    {
+      "name": "Title 2",
+      "value": null
+    },
+    {
+      "name": "Title 3",
+      "value": null
+    },
+    {
+      "name": "Not revision managed",
+      "value": false
+    },
+    {
+      "name": "Exclude from all BOMs",
+      "value": false
+    },
+    {
+      "name": "Unit of measure",
+      "value": "Each"
+    },
+    {
+      "name": "Mass",
+      "value": null
+    },
+    {
+      "name": "Center of mass",
+      "value": null
+    },
+    {
+      "name": "Inertia",
+      "value": null
+    },
+    {
+      "name": "Subassembly BOM behavior",
+      "value": "0"
+    }
+  ],
+  "href": "https://cad.onshape.com/api/metadata/d/31100e50245b627866e4545b/m/f11b17c2814419fe128024fa/e/8f34acdfc8a957801e58fad7?configuration=default"
+}
