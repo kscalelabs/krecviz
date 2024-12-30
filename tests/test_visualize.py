@@ -1,4 +1,4 @@
-"""Defines a dummy test."""
+"""Defines basic visualization tests."""
 
 from pathlib import Path
 
@@ -56,13 +56,57 @@ def _test_run_visualization_simple_onshape_2_joints_asymmetrical_adhoc() -> None
     )
 
 
+def _test_run_visualization_simple_adhoc() -> None:
+    """Run visualization on an ad-hoc basis, showing the GUI."""
+    visualize_krec(
+        krec_path=None,
+        urdf_path=EXAMPLE_URDF_PATHS["simple"],
+    )
+
+
+def _test_run_visualization_simple_onshape_2_joints_adhoc() -> None:
+    """Run visualization on an ad-hoc basis, showing the GUI."""
+    visualize_krec(
+        krec_path=None,
+        urdf_path=EXAMPLE_URDF_PATHS["simple_onshape_2_joints"],
+    )
+
+
+def _test_run_visualization_simple_onshape_4_joints_adhoc() -> None:
+    """Run visualization on an ad-hoc basis, showing the GUI."""
+    visualize_krec(
+        krec_path=None,
+        urdf_path=EXAMPLE_URDF_PATHS["simple_onshape_4_joints"],
+    )
+
+
+def _test_run_visualization_xbot_adhoc() -> None:
+    """Run visualization on an ad-hoc basis, showing the GUI."""
+    visualize_krec(
+        krec_path=None,
+        urdf_path=EXAMPLE_URDF_PATHS["xbot"],
+    )
+
+
 if __name__ == "__main__":
     # python -m tests.test_visualize
 
-    # Coose which test to run here, running both at the same time doesn't work with rerun.
+    # Choose which test to run here, running both at the same time doesn't work with rerun.
 
     # Full gpr robot
     # _test_run_visualization_gpr_adhoc()
 
     # Simple 2 joint URDF
     _test_run_visualization_simple_onshape_2_joints_asymmetrical_adhoc()
+
+    # Simple URDF
+    # _test_run_visualization_simple_adhoc()
+
+    # Simple 2 joint URDF (symmetrical)
+    # _test_run_visualization_simple_onshape_2_joints_adhoc()
+
+    # Simple 4 joint URDF
+    # _test_run_visualization_simple_onshape_4_joints_adhoc()
+
+    # XBot URDF
+    # _test_run_visualization_xbot_adhoc()
