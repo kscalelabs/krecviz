@@ -1,11 +1,7 @@
-"""
-Tests a generated (in-code) simplified URDF by calling 'visualize_krec'.
-"""
+"""Tests a generated (in-code) simplified URDF by calling 'visualize_krec'."""
 
-import pytest
 import xml.etree.ElementTree as ET
 from pathlib import Path
-from tqdm import tqdm
 
 # Import your visualization function. Adjust the import path if needed.
 from krecviz.visualize import visualize_krec
@@ -19,8 +15,9 @@ URDF_BASE_PATH.mkdir(parents=True, exist_ok=True)
 
 
 def create_simplified_urdf(urdf_file: Path) -> None:
-    """
-    Create a minimal URDF for visualization:
+    """Create a minimal URDF for visualization.
+
+    Create a minimal URDF with:
     - 4 links (base, Part_1, Part_1_2, Part_1_3)
     - 1 fixed joint (floating_base)
     - 2 revolute joints (Revolute_2 and Revolute_3)
@@ -97,8 +94,9 @@ def create_simplified_urdf(urdf_file: Path) -> None:
 
 
 def _test_run_visualization_generated_simplified_adhoc() -> None:
-    """
-    Ad-hoc test: directly call visualize_krec in interactive mode (no output path).
+    """Run ad-hoc test with interactive visualization.
+
+    Directly call visualize_krec in interactive mode (no output path).
     Launches the GUI so you can confirm the model visually.
     """
     # Create a local URDF file
@@ -106,9 +104,6 @@ def _test_run_visualization_generated_simplified_adhoc() -> None:
     create_simplified_urdf(temp_urdf)
 
     visualize_krec(krec_path=None, urdf_path=temp_urdf)
-
-    # Clean up if desired, or leave for inspection
-    # temp_urdf.unlink(missing_ok=True)
 
 
 if __name__ == "__main__":
