@@ -216,8 +216,9 @@ fn log_link_meshes_at_identity(
         rec.log(mesh_entity_path.as_str(), &mesh3d)?;
     }
 
-    let doc_entity = format!("{}/text_summary", entity_path);
-    rec.log(doc_entity.as_str(), &TextDocument::new(doc_text))?;
+    // Log text summaries, useful for debugging 
+    // let doc_entity = format!("{}/text_summary", entity_path);
+    // rec.log(doc_entity.as_str(), &TextDocument::new(doc_text))?;
 
     Ok(())
 }
