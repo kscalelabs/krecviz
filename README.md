@@ -84,7 +84,9 @@ RUST_LOG=krecviz_rust=debug  cargo run --    \
 
 ## Tests
 
-### Python 
+### Python
+
+#### Various examples from the web
 
 These tests will show what a correct visualization should look like.
 
@@ -93,15 +95,46 @@ In the `krecviz/tests/test_visualize.py` file, you can uncommnet which visualiza
 ```bash
 # cd to the repo root
 cd krecviz
+# uncomment the test you want to run
 python -m tests.test_visualize 
 ```
 
+#### Manual URDF
+
+The file `krecviz/tests/test_manual_urdf.py` creates a minimal URDF with 3 links, 2 joints, and visualizes it.
+
+You can then visualize this same URDF with rust to see the difference in the rotation, and compare the logs.
+
+```bash
+# cd to the repo root
+cd krecviz
+python -m tests.test_manual_urdf
+```
+
+
 ### Rust
 
+#### Various examples from the web
 These tests will show incorrect rotations, despite having the same logic as the python code/tests.
 
 ```bash
 # cd to the repo root
 cd krecviz_rust
+# uncomment the test you want to run
 cargo test
+# to get the logs as well, do 
+RUST_LOG=krecviz_rust=debug cargo test -- --nocapture
+```
+
+#### Manual URDF
+
+To visualize the manual URDF created by the python script above, we simply pass the path to the urdf file to the rust code.
+
+```bash
+# cd to the repo root
+cd krecviz_rust
+# uncomment the manual_urdf test
+cargo test
+# to get the logs as well, do 
+RUST_LOG=krecviz_rust=debug cargo test -- --nocapture
 ```
