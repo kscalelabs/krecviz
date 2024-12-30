@@ -94,7 +94,6 @@ In the `krecviz/tests/test_visualize.py` file, you can uncommnet which visualiza
 
 ```bash
 # cd to the repo root
-cd krecviz
 # uncomment the test you want to run
 python -m tests.test_visualize 
 ```
@@ -107,7 +106,6 @@ You can then visualize this same URDF with rust to see the difference in the rot
 
 ```bash
 # cd to the repo root
-cd krecviz
 python -m tests.test_manual_urdf
 ```
 
