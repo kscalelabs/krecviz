@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name="generated_simplified_robot">
+  <link name="base" />
+  <joint name="floating_base" type="fixed">
+    <origin xyz="0 0 0" rpy="0 0 0" />
+    <parent link="base" />
+    <child link="Part_1" />
+  </joint>
+  <link name="Part_1">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="meshes/Part_1.stl" />
+      </geometry>
+      <material name="Part_1_color">
+        <color rgba="0.8 0.4 0.1 1.0" />
+      </material>
+    </visual>
+  </link>
+  <joint name="Revolute_2" type="revolute">
+    <origin xyz="-0.015 0.0025 -0.0012" rpy="1.5708 0 1.5708" />
+    <parent link="Part_1" />
+    <child link="Part_1_2" />
+    <axis xyz="0 0 1" />
+    <limit effort="80" velocity="5" lower="-1.5707963" upper="1.5707963" />
+  </joint>
+  <link name="Part_1_2">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="meshes/Part_1_2.stl" />
+      </geometry>
+      <material name="Part_1_2_color">
+        <color rgba="0.7 0.6 0.3 1.0" />
+      </material>
+    </visual>
+  </link>
+  <joint name="Revolute_3" type="revolute">
+    <origin xyz="0 0.0025 -0.014" rpy="3.1415927 0 0" />
+    <parent link="Part_1" />
+    <child link="Part_1_3" />
+    <axis xyz="0 0 -1" />
+    <limit effort="80" velocity="5" lower="-1.5707963" upper="1.5707963" />
+  </joint>
+  <link name="Part_1_3">
+    <visual>
+      <origin xyz="0 0 0" rpy="0 0 0" />
+      <geometry>
+        <mesh filename="meshes/Part_1_3.stl" />
+      </geometry>
+      <material name="Part_1_3_color">
+        <color rgba="0.5 0.5 0.8 1.0" />
+      </material>
+    </visual>
+  </link>
+</robot>
