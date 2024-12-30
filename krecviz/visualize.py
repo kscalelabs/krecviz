@@ -227,19 +227,19 @@ def debug_print_joint_update(
 
     Mimics the style of the Rust debug-print helper.
     """
-    logging.info(
+    logging.debug(
         "Updating joint '%s' => entity_path='%s'",
         joint_name,
         entity_path,
     )
-    logging.info(
+    logging.debug(
         "  angle_deg=%.3f => angle_rad=%.3f",
         angle_deg,
         angle_rad,
     )
-    logging.info("  translation=%s", translation)
-    logging.info("  base_rotation=%s", np.array(base_rotation))
-    logging.info("  new_rotation=%s", new_rotation)
+    logging.debug("  translation=%s", translation)
+    logging.debug("  base_rotation=%s", np.array(base_rotation))
+    logging.debug("  new_rotation=%s", new_rotation)
 
 
 if __name__ == "__main__":

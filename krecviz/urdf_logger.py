@@ -17,17 +17,20 @@ import rerun as rr
 import trimesh
 from urdf_parser_py import urdf as urdf_parser  # type: ignore[import-untyped]
 
+# Add logging configuration at the top level
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
+
 
 # Separate debug-print functions.
 def debug_print_log_view_coordinates(
     entity_path_val: str, entity_val: rr.components.view_coordinates.ViewCoordinates, timeless_val: bool
 ) -> None:
     """Print debug info before calling rr.log(...) for the root view coordinates."""
-    print("======================")
-    print("rerun_log")
-    print(f"entity_path = self.add_entity_path_prefix(\"\") with value '{entity_path_val}'")
-    print(f"entity = rr.ViewCoordinates.RIGHT_HAND_Z_UP with value {entity_val}")
-    print(f"timeless = {timeless_val}")
+    logging.debug("======================")
+    logging.debug("rerun_log")
+    logging.debug("entity_path = self.add_entity_path_prefix(\"\") with value '%s'", entity_path_val)
+    logging.debug("entity = rr.ViewCoordinates.RIGHT_HAND_Z_UP with value %s", entity_val)
+    logging.debug("timeless = %s", timeless_val)
 
 
 def debug_print_log_joint(
@@ -37,58 +40,57 @@ def debug_print_log_joint(
     rotation: list[list[float]] | None,
 ) -> None:
     """Print debug info before logging the Transform3D of a joint."""
-    print("======================")
-    print("rerun_log")
-    print(f"entity_path = entity_path_w_prefix with value '{entity_path_w_prefix}'")
-    print("Original joint RPY values:")
+    logging.debug("======================")
+    logging.debug("rerun_log")
+    logging.debug("entity_path = entity_path_w_prefix with value '%s'", entity_path_w_prefix)
+    logging.debug("Original joint RPY values:")
     if joint.origin is not None and joint.origin.rpy is not None:
-        print(f"  => rpy = {[round(float(x), 3) for x in joint.origin.rpy]}")
+        logging.debug("  => rpy = %s", [round(float(x), 3) for x in joint.origin.rpy])
     else:
-        print("  => rpy = None")
+        logging.debug("  => rpy = None")
 
-    print("entity = rr.Transform3D with:")
-    print("  translation:", [f"{x:>8.3f}" for x in translation] if translation else None)
-    print("  mat3x3:")
+    logging.debug("entity = rr.Transform3D with:")
+    logging.debug("  translation: %s", [f"{x:>8.3f}" for x in translation] if translation else None)
+    logging.debug("  mat3x3:")
     if rotation:
         for row in rotation:
-            print("    [" + ", ".join(f"{x:>8.3f}" for x in row) + "]")
+            logging.debug("    [%s]", ", ".join(f"{x:>8.3f}" for x in row))
     else:
-        print("    None")
+        logging.debug("    None")
 
 
 def debug_print_unsupported_geometry(entity_path_val: str, log_text: str) -> None:
     """Print debug info for the 'Unsupported geometry' case before logging rr.TextLog."""
-    print("======================")
-    print("rerun_log")
-    print(f"entity_path = self.add_entity_path_prefix(\"\") with value '{entity_path_val}'")
-    print(f"entity = rr.TextLog(...) with value '{log_text}'")
+    logging.debug("======================")
+    logging.debug("rerun_log")
+    logging.debug("entity_path = self.add_entity_path_prefix(\"\") with value '%s'", entity_path_val)
+    logging.debug("entity = rr.TextLog(...) with value '%s'", log_text)
 
 
 def debug_print_log_trimesh(
     entity_path: str, mesh3d_entity: rr.Mesh3D, timeless_val: bool, mesh: trimesh.Trimesh
 ) -> None:
     """Print debug info prior to rr.log(...) a single Trimesh."""
-    print("======================")
-    print("rerun_log log_trimesh")
-    print(f"entity_path = entity_path with value '{entity_path}'")
-    print("entity = rr.Mesh3D(...) with these numeric values:")
+    logging.debug("======================")
+    logging.debug("rerun_log log_trimesh")
+    logging.debug("entity_path = entity_path with value '%s'", entity_path)
+    logging.debug("entity = rr.Mesh3D(...) with these numeric values:")
 
-    # Print only the first three vertex positions for brevity
     first_three_vertices = mesh.vertices[:3].tolist()
-    print("  => vertex_positions (first 3):")
+    logging.debug("  => vertex_positions (first 3):")
     for vertex in first_three_vertices:
-        print(f"      [{', '.join(f'{x:>7.3f}' for x in vertex)}]")
+        logging.debug("      [%s]", ", ".join(f"{x:>7.3f}" for x in vertex))
 
-    print(f"timeless = {timeless_val}")
+    logging.debug("timeless = %s", timeless_val)
 
 
 def debug_print_final_link_transform(link_name: str, chain: list[str], final_tf: np.ndarray) -> None:
     """Print the final transform accumulated for a link."""
-    print(f"Link '{link_name}': BFS chain = {chain}")
-    print("  => final_tf (4x4) =")
+    logging.debug("Link '%s': BFS chain = %s", link_name, chain)
+    logging.debug("  => final_tf (4x4) =")
     for row in final_tf:
-        print("  [{: 8.3f} {: 8.3f} {: 8.3f} {: 8.3f}]".format(*row))
-    print()
+        logging.debug("  [%8.3f %8.3f %8.3f %8.3f]", *row)
+    logging.debug("")
 
 
 def rotation_from_euler_xyz(rpy: list[float] | tuple[float, float, float]) -> np.ndarray:
@@ -304,10 +306,10 @@ class URDFLogger:
         For each link, accumulate the joint transforms from root -> link, then print the resulting final 4x4.
         """
         root_link = self.urdf.get_root()
-        print("\n========== FINAL ACCUMULATED TRANSFORMS PER LINK ==========")
+        logging.debug("\n========== FINAL ACCUMULATED TRANSFORMS PER LINK ==========")
         for link in self.urdf.links:
             if link.name == root_link:
-                print(f"Link '{link.name}': Root link => final transform is identity.\n")
+                logging.debug("Link '%s': Root link => final transform is identity.\n", link.name)
                 continue
 
             chain = self.urdf.get_chain(root_link, link.name)
@@ -320,7 +322,7 @@ class URDFLogger:
                         j = jt
                         break
                 if j is None:
-                    print(f"  (!) Could not find joint named '{joint_name}' in URDF?")
+                    logging.debug("  (!) Could not find joint named '%s' in URDF?", joint_name)
                     continue
 
                 xyz = j.origin.xyz if j.origin and j.origin.xyz else [0, 0, 0]
