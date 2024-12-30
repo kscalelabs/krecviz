@@ -1,20 +1,27 @@
 use anyhow::Result;
 use clap::Parser;
+use env_logger::{Builder, Env};
 use rerun::RecordingStream; // for rec.set_time_sequence(...)
 use std::collections::HashMap;
 use std::f64::consts::PI;
 
+mod debug_log_utils;
+mod geometry_utils;
+mod repl_utils;
+mod spatial_transform_utils;
+mod urdf_bfs_utils;
 mod urdf_logger;
 
-use urdf_logger::{
-    parse_and_log_urdf_hierarchy,
-    build_joint_name_to_entity_path, // our new BFS-based function
+use debug_log_utils::debug_print_actuator_transform;
+use repl_utils::interactive_transform_repl;
+use spatial_transform_utils::{
+    build_z_rotation_4x4, decompose_4x4_to_translation_and_mat3x3,
 };
+use urdf_bfs_utils::build_joint_name_to_entity_path;
+use urdf_logger::parse_and_log_urdf_hierarchy;
 
 // KREC crate: adjust your path/names if needed!
 use krec::KRec;
-use krec::KRecFrame;
-use urdf_rs::Joint;
 
 // -----------------------------------------------------------------------------
 // Actuator -> Joint map
@@ -47,32 +54,6 @@ fn build_actuator_to_urdf_joint_map() -> HashMap<u32, &'static str> {
     map.insert(45, "R_ankle_y");
 
     map
-}
-
-// -----------------------------------------------------------------------------
-// Minimal 4x4 row-major transform builder that just rotates around Z
-// -----------------------------------------------------------------------------
-fn build_z_rotation_4x4(angle_rad: f64) -> [f32; 16] {
-    let cz = angle_rad.cos() as f32;
-    let sz = angle_rad.sin() as f32;
-
-    [
-        cz,  -sz, 0.0, 0.0,
-        sz,   cz, 0.0, 0.0,
-        0.0,  0.0, 1.0, 0.0,
-        0.0,  0.0, 0.0, 1.0,
-    ]
-}
-
-/// Convert a 4x4 into (translation, 3x3) for logging as a `Transform3D`.
-fn decompose_4x4_to_translation_and_mat3x3(tf: [f32; 16]) -> ([f32; 3], [f32; 9]) {
-    let translation = [tf[3], tf[7], tf[11]];
-    let mat3x3 = [
-        tf[0], tf[1], tf[2],
-        tf[4], tf[5], tf[6],
-        tf[8], tf[9], tf[10],
-    ];
-    (translation, mat3x3)
 }
 
 /// Log basic scalar values for an actuator (like position, velocity, torque) if present.
@@ -130,12 +111,17 @@ struct Args {
 }
 
 fn main() -> Result<()> {
+    // Initialize logger with custom filter
+    Builder::from_env(Env::default().default_filter_or("krecviz_rust=debug")).init();
+
     // Show the parsed CLI args
     let args = dbg!(Args::parse());
 
     // 1) Start a Rerun recording
-    let rec = dbg!(rerun::RecordingStreamBuilder::new("rust_krecviz_hierarchy_example"))
-        .spawn()?;
+    let rec = dbg!(rerun::RecordingStreamBuilder::new(
+        "rust_krecviz_hierarchy_example"
+    ))
+    .spawn()?;
 
     // 2) If we have a URDF, parse & log it hierarchically
     let mut joint_name_to_entity_path = HashMap::new();
@@ -174,7 +160,8 @@ fn main() -> Result<()> {
                         if let Some(pos_deg) = state.position {
                             let angle_rad = pos_deg * (PI / 180.0);
                             let tf4x4 = build_z_rotation_4x4(angle_rad);
-                            let (translation, mat3x3) = decompose_4x4_to_translation_and_mat3x3(tf4x4);
+                            let (translation, mat3x3) =
+                                decompose_4x4_to_translation_and_mat3x3(tf4x4);
 
                             // Use helper function to print debug info
                             debug_print_actuator_transform(
@@ -213,37 +200,8 @@ fn main() -> Result<()> {
         dbg!("No KREC path provided, so no frame-by-frame animation is logged.");
     }
 
-    // Sleep so we can see the result in the viewer
-    std::thread::sleep(std::time::Duration::from_secs(5));
-
+    // REPL to apply transforms to the URDF
+    // For debugging
+    interactive_transform_repl(&rec)?;
     Ok(())
-}
-
-// -----------------------------------------------------------------------------
-// Debug-print Helper Functions
-// -----------------------------------------------------------------------------
-
-fn debug_print_actuator_transform(
-    frame_idx: usize,
-    actuator_id: u32,
-    joint_name: &str,
-    entity_path: &str,
-    pos_deg: f64,
-    angle_rad: f64,
-    tf4x4: [f32; 16],
-    translation: [f32; 3],
-    mat3x3: [f32; 9],
-) {
-    println!(
-        "[frame={}] actuator_id={} => joint='{}' => entity_path='{}'",
-        frame_idx, actuator_id, joint_name, entity_path
-    );
-    println!(
-        "  angle_deg={} => angle_rad={:.3} => transform_4x4={:?}",
-        pos_deg, angle_rad, tf4x4
-    );
-    println!(
-        "  => translation={:?}, mat3x3={:?}",
-        translation, mat3x3
-    );
 }
