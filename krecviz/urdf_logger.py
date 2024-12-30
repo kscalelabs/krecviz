@@ -15,7 +15,6 @@ from pathlib import Path
 import numpy as np
 import rerun as rr
 import trimesh
-from PIL import Image
 from urdf_parser_py import urdf as urdf_parser  # type: ignore[import-untyped]
 
 
