@@ -186,18 +186,17 @@ class URDFLogger:
         rr.log(
             entity_path=entity_path_val,
             entity=entity_val,
-            static=timeless_val,
         )
-
-        # Now log joints
-        for joint in self.urdf.joints:
-            entity_path = self.joint_entity_path(joint)
-            self.log_joint(entity_path, joint)
 
         # Now log links
         for link in self.urdf.links:
             entity_path = self.link_entity_path(link)
             self.log_link(entity_path, link)
+
+        # Now log joints
+        for joint in self.urdf.joints:
+            entity_path = self.joint_entity_path(joint)
+            self.log_joint(entity_path, joint)
 
         # Print final transforms
         self.print_final_link_transforms()
@@ -205,7 +204,8 @@ class URDFLogger:
     def log_link(self, entity_path: str, link: urdf_parser.Link) -> None:
         """Log a URDF link to Rerun."""
         for i, visual in enumerate(link.visuals):
-            self.log_visual(entity_path + f"/visual_{i}", visual)
+            visual_path = entity_path + f"/visual_{i}"
+            self.log_visual(visual_path, visual)
 
     def log_joint(self, entity_path: str, joint: urdf_parser.Joint) -> None:
         """Log a URDF joint to Rerun."""
@@ -223,7 +223,6 @@ class URDFLogger:
         if isinstance(translation, list) and isinstance(rotation, list):
             self.entity_to_transform[entity_path_w_prefix] = (translation, rotation)
 
-        # --- CHANGED ---
         debug_print_log_joint(entity_path_w_prefix, joint, translation, rotation)
 
         transform_3d = rr.Transform3D(translation=translation, mat3x3=rotation)
@@ -267,42 +266,14 @@ class URDFLogger:
             )
         else:
             raise ValueError(f"Unsupported geometry type: {type(visual.geometry)}")
-            log_text = f"Unsupported geometry type: {type(visual.geometry)}"
-            entity_path_val = self.add_entity_path_prefix("")
 
-            # --- CHANGED ---
-            debug_print_unsupported_geometry(entity_path_val, log_text)
-
-            rr.log(
-                entity_path=entity_path_val,
-                entity=rr.TextLog(log_text),
-            )
-            mesh_or_scene = trimesh.Trimesh()
-
-        # If we have a Scene, break it down into Trimeshes
-        if isinstance(mesh_or_scene, trimesh.Scene):
-            mesh_or_scene.apply_transform(transform)
-            for i, mesh in enumerate(scene_to_trimeshes(mesh_or_scene)):
-                if material is not None and not isinstance(mesh.visual, trimesh.visual.texture.TextureVisuals):
-                    if material.color is not None:
-                        mesh.visual = trimesh.visual.ColorVisuals()
-                        mesh.visual.vertex_colors = material.color.rgba
-                    elif material.texture is not None:
-                        texture_path = self.resolve_ros_path(material.texture.filename)
-                        mesh.visual = trimesh.visual.texture.TextureVisuals(image=Image.open(str(texture_path)))
-
-                final_entity_path = self.add_entity_path_prefix(entity_path + f"/{i}")
-                log_trimesh(final_entity_path, mesh)
-        elif isinstance(mesh_or_scene, trimesh.Trimesh):
+        if isinstance(mesh_or_scene, trimesh.Trimesh):
             mesh = mesh_or_scene
             mesh.apply_transform(transform)
             if material is not None and not isinstance(mesh.visual, trimesh.visual.texture.TextureVisuals):
                 if material.color is not None:
                     mesh.visual = trimesh.visual.ColorVisuals()
                     mesh.visual.vertex_colors = material.color.rgba
-                elif material.texture is not None:
-                    texture_path = self.resolve_ros_path(material.texture.filename)
-                    mesh.visual = trimesh.visual.texture.TextureVisuals(image=Image.open(str(texture_path)))
 
             final_entity_path = self.add_entity_path_prefix(entity_path)
             log_trimesh(final_entity_path, mesh)
@@ -438,7 +409,6 @@ def log_trimesh(entity_path: str, mesh: trimesh.Trimesh) -> None:
     rr.log(
         entity_path=entity_path,
         entity=mesh3d_entity,
-        static=timeless_val,
     )
 
 
