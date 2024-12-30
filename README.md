@@ -81,3 +81,27 @@ RUST_LOG=krecviz_rust=debug  cargo run --    \
     --urdf ../tests/assets/urdf_examples/gpr/robot.urdf \
     --krec ../tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
 ```
+
+## Tests
+
+### Python 
+
+These tests will show what a correct visualization should look like.
+
+In the `krecviz/tests/test_visualize.py` file, you can uncommnet which visualization test you want to run. (In python, running multiple visualizations from the same file overwrites the previous visualization, so one at a time for now.)
+
+```bash
+# cd to the repo root
+cd krecviz
+python -m tests.test_visualize 
+```
+
+### Rust
+
+These tests will show incorrect rotations, despite having the same logic as the python code/tests.
+
+```bash
+# cd to the repo root
+cd krecviz_rust
+cargo test
+```
