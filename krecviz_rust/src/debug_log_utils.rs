@@ -53,33 +53,21 @@ pub fn debug_print_joint_transform(
     child_path: &str,
     rpy: [f64; 3],
 ) {
-    debug!("----------------------");
-    debug!(
-        "Applying joint '{}' => child link '{}'",
-        joint_name, child_link
-    );
-    debug!("child_path='{}'", child_path);
+    debug!("rerun_log");
+    debug!("entity_path = entity_path_w_prefix with value '{}'", child_path);
+    debug!("Original joint RPY values:");
+    debug!("  => rpy = [{:.3}, {:.3}, {:.3}]", rpy[0], rpy[1], rpy[2]);
 
-    debug!(
-        "Original joint RPY values: [{:>8.3}, {:>8.3}, {:>8.3}]",
-        rpy[0], rpy[1], rpy[2]
-    );
-
-    // Print full 4x4 matrix:
-    for row_i in 0..4 {
-        let base = row_i * 4;
-        debug!(
-            "[{:8.3} {:8.3} {:8.3} {:8.3}]",
-            local_tf_4x4[base],
-            local_tf_4x4[base + 1],
-            local_tf_4x4[base + 2],
-            local_tf_4x4[base + 3],
-        );
-    }
-
-    debug!("mat3x3:");
-    let (_translation, mat3x3) =
+    let (translation, mat3x3) =
         crate::spatial_transform_utils::decompose_4x4_to_translation_and_mat3x3(local_tf_4x4);
+
+    debug!("entity = rr.Transform3D with:");
+    debug!(
+        "  translation: ['{:>8.3}', '{:>8.3}', '{:>8.3}']",
+        translation[0], translation[1], translation[2]
+    );
+    
+    debug!("  mat3x3:");
     for row_i in 0..3 {
         let start = row_i * 3;
         debug!(
@@ -89,6 +77,7 @@ pub fn debug_print_joint_transform(
             mat3x3[start + 2]
         );
     }
+    debug!("======================");
 }
 
 /// Print the final accumulated transforms for each link in the robot.
