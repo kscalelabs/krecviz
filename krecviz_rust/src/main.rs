@@ -14,9 +14,7 @@ mod urdf_logger;
 
 use debug_log_utils::debug_print_actuator_transform;
 use repl_utils::interactive_transform_repl;
-use spatial_transform_utils::{
-    build_z_rotation_4x4, decompose_4x4_to_translation_and_mat3x3,
-};
+use spatial_transform_utils::{build_z_rotation_4x4, decompose_4x4_to_translation_and_mat3x3};
 use urdf_bfs_utils::build_joint_name_to_entity_path;
 use urdf_logger::parse_and_log_urdf_hierarchy;
 

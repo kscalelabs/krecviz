@@ -19,6 +19,12 @@ tri-mesh = "0.6.1"
 three-d-asset = "0.9.2"
 log = "0.4.22"
 env_logger = "0.11.6"
+lazy_static = "1.5.0"
+tempfile = "3.14.0"
+
+[lib]
+name = "krecviz_rust"
+path = "src/lib.rs"
 
 [[bin]]
 name = "krecviz_rust"
