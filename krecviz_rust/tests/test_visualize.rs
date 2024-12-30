@@ -1,6 +1,8 @@
 use anyhow::Result;
 use std::collections::HashMap;
 use std::path::Path;
+use log::{debug, info};
+use env_logger;
 
 // Import the necessary functions from your crate
 use krecviz_rust::{build_joint_name_to_entity_path, parse_and_log_urdf_hierarchy};
@@ -32,6 +34,7 @@ fn build_urdf_paths() -> HashMap<&'static str, String> {
     let urdf_files = [
         ("gpr", "gpr/robot.urdf"),
         ("simple", "simple/example.urdf"),
+        ("manual_urdf", "manual_urdf/manual_example.urdf"),
         (
             "simple_onshape_2_joints",
             "simple_onshape_2_joints/assembly_1.urdf",
@@ -55,21 +58,63 @@ fn build_urdf_paths() -> HashMap<&'static str, String> {
     paths
 }
 
-#[test]
-fn test_run_visualization_gpr_adhoc() -> Result<()> {
-    let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
+// #[test]
+// fn test_run_visualization_gpr_adhoc() -> Result<()> {
+//     let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
 
-    parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["gpr"], &rec)?;
+//     parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["gpr"], &rec)?;
+//     Ok(())
+// }
+
+
+// #[test]
+// fn test_run_visualization_simple_adhoc() -> Result<()> {
+//     let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
+//     parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["simple"], &rec)?;
+//     Ok(())
+// }
+
+
+#[test]
+fn test_run_manual_urdf_adhoc() -> Result<()> {
+    let _ = env_logger::try_init();
+    let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
+    parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["manual_urdf"], &rec)?;
     Ok(())
 }
 
-#[test]
-fn test_run_visualization_simple_onshape_2_joints_asymmetrical_adhoc() -> Result<()> {
-    let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
 
-    parse_and_log_urdf_hierarchy(
-        &EXAMPLE_URDF_PATHS["simple_onshape_2_joints_asymmetrical"],
-        &rec,
-    )?;
-    Ok(())
-}
+// #[test]
+// fn test_run_visualization_simple_onshape_2_joints_adhoc() -> Result<()> {
+//     let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
+//     parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["simple_onshape_2_joints"], &rec)?;
+//     Ok(())
+// }
+
+// #[test]
+// fn test_run_visualization_simple_onshape_2_joints_asymmetrical_adhoc() -> Result<()> {
+//     let _ = env_logger::try_init();
+//     let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
+
+//     parse_and_log_urdf_hierarchy(
+//         &EXAMPLE_URDF_PATHS["simple_onshape_2_joints_asymmetrical"],
+//         &rec,
+//     )?;
+//     Ok(())
+// }
+
+// #[test]
+// fn test_run_visualization_simple_onshape_4_joints_adhoc() -> Result<()> {
+//     let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
+//     parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["simple_onshape_4_joints"], &rec)?;
+//     Ok(())
+// }
+
+// #[test]
+// fn test_run_visualization_xbot_adhoc() -> Result<()> {
+//     let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
+//     parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["xbot"], &rec)?;
+//     Ok(())
+// }
+
+
