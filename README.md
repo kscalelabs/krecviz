@@ -74,4 +74,10 @@ cd krecviz_rust
 cargo run -- \
     --urdf ../tests/assets/urdf_examples/gpr/robot.urdf \
     --krec ../tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
+
+
+# run in debug mode 
+RUST_LOG=krecviz_rust=debug  cargo run --    \
+    --urdf ../tests/assets/urdf_examples/gpr/robot.urdf \
+    --krec ../tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
 ```
