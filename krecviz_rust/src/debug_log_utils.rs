@@ -16,15 +16,29 @@ pub fn debug_print_actuator_transform(
     translation: [f32; 3],
     mat3x3: [f32; 9],
 ) {
+    debug!("\n=== Actuator Transform [Frame {}] ===", frame_idx);
+    debug!("Actuator ID: {}", actuator_id);
+    debug!("Joint Name:  '{}'", joint_name);
+    debug!("Entity Path: '{}'", entity_path);
+    debug!("Angle: {:.3}° ({:.3} rad)", pos_deg, angle_rad);
+
+    debug!("\nDecomposed Transform:");
     debug!(
-        "[frame={}] actuator_id={} => joint='{}' => entity_path='{}'",
-        frame_idx, actuator_id, joint_name, entity_path
+        "  Translation: [{:8.3}, {:8.3}, {:8.3}]",
+        translation[0], translation[1], translation[2]
     );
-    debug!(
-        "  angle_deg={} => angle_rad={:.3} => transform_4x4={:?}",
-        pos_deg, angle_rad, tf4x4
-    );
-    debug!("  => translation={:?}, mat3x3={:?}", translation, mat3x3);
+
+    debug!("  Rotation Matrix (3x3):");
+    for row in 0..3 {
+        let idx = row * 3;
+        debug!(
+            "    [{:8.3} {:8.3} {:8.3}]",
+            mat3x3[idx],
+            mat3x3[idx + 1],
+            mat3x3[idx + 2]
+        );
+    }
+    debug!("=====================================\n");
 }
 
 /// Print debug information about loading an STL file.
