@@ -15,16 +15,16 @@ use rerun::{
 use urdf_rs::{self, Geometry, Joint, Link, Material, Robot};
 
 use crate::debug_log_utils::{
-    debug_print_joint_transform, debug_print_mesh_log, debug_print_stl_load,
-    print_final_link_transforms, debug_print_transform_chain, debug_print_link_transform_info,
-    debug_print_bfs_joint_transforms,
+    debug_print_bfs_joint_transforms, debug_print_joint_transform, debug_print_link_transform_info,
+    debug_print_mesh_log, debug_print_stl_load, debug_print_transform_chain,
+    print_final_link_transforms,
 };
 use crate::geometry_utils::{
     apply_4x4_to_mesh3d, compute_vertex_normals, float_rgba_to_u8, load_image_as_rerun_buffer,
     load_stl_as_mesh3d,
 };
 use crate::spatial_transform_utils::{
-    build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3, mat4x4_mul, identity_4x4,
+    build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3, identity_4x4, mat4x4_mul,
 };
 use crate::urdf_bfs_utils::{
     build_adjacency, build_link_paths_map, find_root_link_name, link_entity_path,
@@ -48,7 +48,7 @@ fn compute_bfs_transform_for_link(
     link_paths_map: &HashMap<String, Vec<String>>,
     robot: &Robot,
 ) -> ([f32; 16], Vec<String>) {
-    let mut global_tf = identity_4x4();      // start with identity
+    let mut global_tf = identity_4x4(); // start with identity
     let mut bfs_chain_for_debug = Vec::new();
 
     if let Some(chain) = link_paths_map.get(link_name) {
@@ -57,8 +57,16 @@ fn compute_bfs_transform_for_link(
         while i < chain.len() {
             let joint_name = &chain[i];
             if let Some(joint) = robot.joints.iter().find(|jj| jj.name == *joint_name) {
-                let xyz = [joint.origin.xyz[0], joint.origin.xyz[1], joint.origin.xyz[2]];
-                let rpy = [joint.origin.rpy[0], joint.origin.rpy[1], joint.origin.rpy[2]];
+                let xyz = [
+                    joint.origin.xyz[0],
+                    joint.origin.xyz[1],
+                    joint.origin.xyz[2],
+                ];
+                let rpy = [
+                    joint.origin.rpy[0],
+                    joint.origin.rpy[1],
+                    joint.origin.rpy[2],
+                ];
                 let local_tf_4x4 = build_4x4_from_xyz_rpy(xyz, rpy);
 
                 global_tf = mat4x4_mul(global_tf, local_tf_4x4);
@@ -228,7 +236,13 @@ pub fn log_link_meshes_at_identity(
         // apply_4x4_to_mesh3d(&mut mesh3d, final_tf);
 
         // Optionally debug-print link transform
-        debug_print_link_transform_info(link.name.as_str(), &bfs_chain_for_debug, final_tf, &mesh_entity_path, rpy);
+        debug_print_link_transform_info(
+            link.name.as_str(),
+            &bfs_chain_for_debug,
+            final_tf,
+            &mesh_entity_path,
+            rpy,
+        );
 
         // optional color
         if let Some(rgba) = mat_info.color_rgba {

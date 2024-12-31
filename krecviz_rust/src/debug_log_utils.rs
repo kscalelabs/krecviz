@@ -16,7 +16,10 @@ pub fn debug_print_actuator_transform(
     translation: [f32; 3],
     mat3x3: [f32; 9],
 ) {
-    debug!("=== debug_print_actuator_transform [Frame {}] ===", frame_idx);
+    debug!(
+        "=== debug_print_actuator_transform [Frame {}] ===",
+        frame_idx
+    );
     debug!("Actuator ID: {}", actuator_id);
     debug!("Joint Name:  '{}'", joint_name);
     debug!("Entity Path: '{}'", entity_path);
@@ -157,10 +160,10 @@ pub fn print_final_link_transforms(robot: &Robot, link_paths_map: &HashMap<Strin
 
 /// Print debug information about transform chain and matrices
 pub fn debug_print_transform_chain(
-    bfs_chain_for_debug: &[String], 
+    bfs_chain_for_debug: &[String],
     i: usize,
     local_tf_4x4: [f32; 16],
-    global_tf: [f32; 16]
+    global_tf: [f32; 16],
 ) {
     debug!("=== debug_print_transform_chain ===");
     debug!("Transform chain so far:");
@@ -198,7 +201,7 @@ pub fn debug_print_link_transform_info(
     bfs_chain: &[String],
     final_tf: [f32; 16],
     mesh_entity_path: &str,
-    rpy: [f64; 3]
+    rpy: [f64; 3],
 ) {
     debug!("=== debug_print_link_transform_info ===");
     debug!("");
@@ -219,7 +222,8 @@ pub fn debug_print_link_transform_info(
     debug!("Original joint RPY values:");
     debug!("  => rpy = [{:.3}, {:.3}, {:.3}]", rpy[0], rpy[1], rpy[2]);
 
-    let (translation, _mat3x3) = crate::spatial_transform_utils::decompose_4x4_to_translation_and_mat3x3(final_tf);
+    let (translation, _mat3x3) =
+        crate::spatial_transform_utils::decompose_4x4_to_translation_and_mat3x3(final_tf);
     debug!("entity = rr.Transform3D with:");
     debug!(
         "  translation: ['{:>8.3}', '{:>8.3}', '{:>8.3}']",
@@ -245,8 +249,14 @@ pub fn debug_print_bfs_joint_transforms(
     debug!("================== BFS Joint Transform Debug ==================");
     debug!("BFS chain (entity path) = '{}'", chain_str);
     debug!("Parent link='{}', child link='{}'", parent, child_link);
-    debug!("Original joint RPY = [{:.3}, {:.3}, {:.3}]", rpy[0], rpy[1], rpy[2]);
-    debug!("Original joint XYZ = [{:.3}, {:.3}, {:.3}]", xyz[0], xyz[1], xyz[2]);
+    debug!(
+        "Original joint RPY = [{:.3}, {:.3}, {:.3}]",
+        rpy[0], rpy[1], rpy[2]
+    );
+    debug!(
+        "Original joint XYZ = [{:.3}, {:.3}, {:.3}]",
+        xyz[0], xyz[1], xyz[2]
+    );
 
     debug!("--- Parent accum transform (root->parent):");
     for row_i in 0..4 {
@@ -288,7 +298,8 @@ pub fn debug_print_bfs_joint_transforms(
     );
     debug!("    local rotation 3x3 = {:?}", local_mat3x3);
 
-    let (translation, mat3x3) = crate::spatial_transform_utils::decompose_4x4_to_translation_and_mat3x3(local_tf_4x4);
+    let (translation, mat3x3) =
+        crate::spatial_transform_utils::decompose_4x4_to_translation_and_mat3x3(local_tf_4x4);
     debug!("Now rec.log('{}', &tf) => That transform3D is:", chain_str);
     debug!(
         "   translation=[{:.3}, {:.3}, {:.3}]",
