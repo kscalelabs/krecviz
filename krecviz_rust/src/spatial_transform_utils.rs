@@ -88,3 +88,13 @@ pub fn decompose_4x4_to_translation_and_mat3x3(tf: [f32; 16]) -> ([f32; 3], [f32
     ];
     (translation, mat3x3)
 }
+
+/// Returns a 4x4 identity matrix as a row-major [f32; 16] array
+pub fn identity_4x4() -> [f32; 16] {
+    [
+        1.0, 0.0, 0.0, 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0,
+    ]
+}
