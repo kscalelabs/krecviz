@@ -12,18 +12,19 @@ use rerun::{
     datatypes::ImageFormat,
     RecordingStream, ViewCoordinates,
 };
-use urdf_rs::{self, Geometry, Joint, Link, Material};
+use urdf_rs::{self, Geometry, Joint, Link, Material, Robot};
 
 use crate::debug_log_utils::{
     debug_print_joint_transform, debug_print_mesh_log, debug_print_stl_load,
-    print_final_link_transforms,
+    print_final_link_transforms, debug_print_transform_chain, debug_print_link_transform_info,
+    debug_print_bfs_joint_transforms,
 };
 use crate::geometry_utils::{
     apply_4x4_to_mesh3d, compute_vertex_normals, float_rgba_to_u8, load_image_as_rerun_buffer,
     load_stl_as_mesh3d,
 };
 use crate::spatial_transform_utils::{
-    build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3,
+    build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3, mat4x4_mul, identity_4x4,
 };
 use crate::urdf_bfs_utils::{
     build_adjacency, build_link_paths_map, find_root_link_name, link_entity_path,
@@ -40,17 +41,54 @@ struct RrMaterialInfo {
     texture_path: Option<PathBuf>,
 }
 
-// ----------------------------------------------------------------------------
-// Stage1: log geometry at identity
-fn log_link_meshes_at_identity(
+/// A small helper that computes the BFS-based global transform for a given link,
+/// as well as returns the BFS chain (for debugging/logging).
+fn compute_bfs_transform_for_link(
+    link_name: &str,
+    link_paths_map: &HashMap<String, Vec<String>>,
+    robot: &Robot,
+) -> ([f32; 16], Vec<String>) {
+    let mut global_tf = identity_4x4();      // start with identity
+    let mut bfs_chain_for_debug = Vec::new();
+
+    if let Some(chain) = link_paths_map.get(link_name) {
+        bfs_chain_for_debug = chain.clone();
+        let mut i = 1;
+        while i < chain.len() {
+            let joint_name = &chain[i];
+            if let Some(joint) = robot.joints.iter().find(|jj| jj.name == *joint_name) {
+                let xyz = [joint.origin.xyz[0], joint.origin.xyz[1], joint.origin.xyz[2]];
+                let rpy = [joint.origin.rpy[0], joint.origin.rpy[1], joint.origin.rpy[2]];
+                let local_tf_4x4 = build_4x4_from_xyz_rpy(xyz, rpy);
+
+                global_tf = mat4x4_mul(global_tf, local_tf_4x4);
+
+                // Optional debug print
+                debug_print_transform_chain(&bfs_chain_for_debug, i, local_tf_4x4, global_tf);
+            }
+            i += 2; // move forward in the BFS chain array
+        }
+    }
+
+    (global_tf, bfs_chain_for_debug)
+}
+
+/// Logs a link’s meshes in Rerun using the “baked” transform (including BFS).
+pub fn log_link_meshes_at_identity(
     link: &Link,
     entity_path: &str,
     urdf_dir: &Path,
     all_mat_map: &HashMap<String, &Material>,
     rec: &RecordingStream,
+    robot: &Robot,
+    link_paths_map: &HashMap<String, Vec<String>>,
 ) -> Result<()> {
     let mut doc_text = format!("Link at IDENTITY: {}\n", link.name);
+    // 1) BFS compute final baked transform for this link
+    let (global_tf, bfs_chain_for_debug) =
+        compute_bfs_transform_for_link(&link.name, link_paths_map, robot);
 
+    // 2) For each visual in this link, create and log geometry
     for (i, vis) in link.visual.iter().enumerate() {
         let mesh_entity_path = format!("{}/visual_{}", entity_path, i);
 
@@ -184,7 +222,13 @@ fn log_link_meshes_at_identity(
         let xyz = [origin.xyz[0], origin.xyz[1], origin.xyz[2]];
         let rpy = [origin.rpy[0], origin.rpy[1], origin.rpy[2]];
         let local_tf_4x4 = build_4x4_from_xyz_rpy(xyz, rpy);
-        apply_4x4_to_mesh3d(&mut mesh3d, local_tf_4x4);
+        let final_tf = mat4x4_mul(global_tf, local_tf_4x4);
+
+        // Bake geometry
+        // apply_4x4_to_mesh3d(&mut mesh3d, final_tf);
+
+        // Optionally debug-print link transform
+        debug_print_link_transform_info(link.name.as_str(), &bfs_chain_for_debug, final_tf, &mesh_entity_path, rpy);
 
         // optional color
         if let Some(rgba) = mat_info.color_rgba {
@@ -306,7 +350,16 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
         let path =
             link_entity_path(&link_paths_map, link_name).unwrap_or_else(|| link_name.clone());
 
-        log_link_meshes_at_identity(link, path.as_str(), &urdf_dir, &mat_map, rec)?;
+        // This call will store final baked tf in the global LINK_TO_WORLD_MAP
+        log_link_meshes_at_identity(
+            link,
+            &path,
+            &urdf_dir,
+            &mat_map,
+            rec,
+            &robot,
+            &link_paths_map,
+        )?;
     }
 
     println!("======================");
