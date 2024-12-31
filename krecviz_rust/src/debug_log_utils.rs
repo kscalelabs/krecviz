@@ -1,7 +1,8 @@
 use crate::spatial_transform_utils::{build_4x4_from_xyz_rpy, mat4x4_mul};
-use crate::urdf_bfs_utils::{build_adjacency, find_root_link_name, get_link_chain};
+use crate::urdf_bfs_utils::{find_root_link_name, get_link_chain};
 use log::debug;
 use urdf_rs::Robot;
+use std::collections::HashMap;
 
 /// Print debug information about an actuator transform.
 pub fn debug_print_actuator_transform(
@@ -47,8 +48,8 @@ pub fn debug_print_mesh_log(entity_path: &str, mesh: &rerun::archetypes::Mesh3D)
 
 /// Print debug information about applying a joint transform.
 pub fn debug_print_joint_transform(
-    joint_name: &str,
-    child_link: &str,
+    _joint_name: &str,
+    _child_link: &str,
     local_tf_4x4: [f32; 16],
     child_path: &str,
     rpy: [f64; 3],
@@ -81,10 +82,11 @@ pub fn debug_print_joint_transform(
 }
 
 /// Print the final accumulated transforms for each link in the robot.
-pub fn print_final_link_transforms(robot: &Robot) {
+pub fn print_final_link_transforms(
+    robot: &Robot,
+    link_paths_map: &HashMap<String, Vec<String>>,
+) {
     if let Some(root_link) = find_root_link_name(&robot.links, &robot.joints) {
-        let adjacency = build_adjacency(&robot.joints);
-
         debug!("\n========== FINAL ACCUMULATED TRANSFORMS PER LINK ==========");
         for link in &robot.links {
             if link.name == root_link {
@@ -94,7 +96,7 @@ pub fn print_final_link_transforms(robot: &Robot) {
                 );
                 continue;
             }
-            if let Some(chain) = get_link_chain(&adjacency, &root_link, &link.name) {
+            if let Some(chain) = get_link_chain(link_paths_map, &link.name) {
                 let mut final_tf = [
                     1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
                 ];

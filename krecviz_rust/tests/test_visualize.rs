@@ -5,7 +5,7 @@ use log::{debug, info};
 use env_logger;
 
 // Import the necessary functions from your crate
-use krecviz_rust::{build_joint_name_to_entity_path, parse_and_log_urdf_hierarchy};
+use krecviz_rust::{parse_and_log_urdf_hierarchy};
 
 const BASE_PATH: &str = env!("CARGO_MANIFEST_DIR");
 const URDF_BASE_PATH: &str = "../tests/assets/urdf_examples";
@@ -60,6 +60,7 @@ fn build_urdf_paths() -> HashMap<&'static str, String> {
 
 // #[test]
 // fn test_run_visualization_gpr_adhoc() -> Result<()> {
+//     let _ = env_logger::try_init();
 //     let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
 
 //     parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["gpr"], &rec)?;

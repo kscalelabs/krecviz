@@ -9,16 +9,12 @@ use parry3d::shape::{Ball as ParrySphere, Cuboid as ParryCuboid, Cylinder as Par
 use rerun::{
     archetypes::{Mesh3D, Transform3D},
     components::{Position3D, TriangleIndices},
-    datatypes::ImageFormat, // Add ImageFormat back
+    datatypes::ImageFormat,
     RecordingStream,
-    TextDocument,
     ViewCoordinates,
 };
 use urdf_rs::{self, Geometry, Joint, Link, Material};
 
-// -----------------------------------------------------------------------------
-// NEW: import from geometry_utils + spatial_transform_utils
-// -----------------------------------------------------------------------------
 use crate::debug_log_utils::{
     debug_print_joint_transform, debug_print_mesh_log, debug_print_stl_load,
     print_final_link_transforms,
@@ -30,7 +26,9 @@ use crate::geometry_utils::{
 use crate::spatial_transform_utils::{
     build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3,
 };
-use crate::urdf_bfs_utils::{build_adjacency, find_root_link_name, link_entity_path};
+use crate::urdf_bfs_utils::{
+    build_adjacency, build_link_paths_map, find_root_link_name, link_entity_path,
+};
 
 // -----------------------------------------------------------------------------
 // Minimal info (color & texture path) from a URDF Material.
@@ -235,6 +233,7 @@ fn apply_joint_transforms_bfs(
 ) -> anyhow::Result<()> {
     let mut queue = VecDeque::new();
     queue.push_back(root_link.to_string());
+    let link_paths_map = build_link_paths_map(adjacency, root_link);
 
     println!("Root link '{}' => no local transform", root_link);
 
@@ -250,7 +249,7 @@ fn apply_joint_transforms_bfs(
 
                 let local_tf_4x4 = build_4x4_from_xyz_rpy([x, y, z], [rr, pp, yy]);
 
-                if let Some(child_path) = link_entity_path(adjacency, root_link, &child_link) {
+                if let Some(child_path) = link_entity_path(&link_paths_map, child_link) {
                     debug_print_joint_transform(
                         &joint.name,
                         child_link,
@@ -259,7 +258,6 @@ fn apply_joint_transforms_bfs(
                         [rr, pp, yy],
                     );
 
-                    // Decompose to a rerun::Transform3D and log it:
                     let (translation, mat3x3) =
                         decompose_4x4_to_translation_and_mat3x3(local_tf_4x4);
                     let tf = Transform3D::from_translation(translation).with_mat3x3(mat3x3);
@@ -284,12 +282,11 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
     let robot = urdf_rs::read_file(urdf_path)
         .map_err(|e| anyhow::anyhow!("Failed to parse URDF {urdf_path:?}: {e}"))?;
 
-    // 2) Build adjacency
+    // 2) Build adjacency and link paths map
     let adjacency = build_adjacency(&robot.joints);
-
-    // 3) Find root link
-    let root_link_name =
-        find_root_link_name(&robot.links, &robot.joints).unwrap_or_else(|| "base".to_string());
+    let root_link_name = find_root_link_name(&robot.links, &robot.joints)
+        .unwrap_or_else(|| "base".to_string());
+    let link_paths_map = build_link_paths_map(&adjacency, &root_link_name);
 
     println!("======================");
     println!("Stage1: log geometry at identity");
@@ -307,7 +304,7 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
     // 4) For each link, log geometry at identity
     for link in &robot.links {
         let link_name = &link.name;
-        let path = link_entity_path(&adjacency, &root_link_name, link_name)
+        let path = link_entity_path(&link_paths_map, link_name)
             .unwrap_or_else(|| link_name.clone());
 
         log_link_meshes_at_identity(link, path.as_str(), &urdf_dir, &mat_map, rec)?;
@@ -317,8 +314,8 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
     println!("Stage2: BFS apply local joint transforms to child links");
     apply_joint_transforms_bfs(&adjacency, &root_link_name, rec)?;
 
-    // Optionally: print final transforms for each link
-    print_final_link_transforms(&robot);
+    // Print final transforms for each link using the pre-computed link_paths_map
+    print_final_link_transforms(&robot, &link_paths_map);
 
     Ok(())
 }

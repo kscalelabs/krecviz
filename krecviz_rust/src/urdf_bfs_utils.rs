@@ -16,28 +16,34 @@ pub fn build_adjacency(joints: &[Joint]) -> HashMap<String, Vec<(Joint, String)>
 pub fn find_root_link_name(links: &[Link], joints: &[Joint]) -> Option<String> {
     let mut all_links = HashSet::new();
     let mut child_links = HashSet::new();
+
     for l in links {
         all_links.insert(l.name.clone());
     }
     for j in joints {
         child_links.insert(j.child.link.clone());
     }
+
     all_links.difference(&child_links).next().cloned()
 }
 
-/// Get the chain of links and joints from root to target using BFS.
-pub fn get_link_chain(
+/// Build a map of `link_name -> full chain of [link, joint, link, joint, ...]`.
+/// This is done by one BFS traversal from the given `root_link`.
+pub fn build_link_paths_map(
     adjacency: &HashMap<String, Vec<(Joint, String)>>,
     root_link: &str,
-    target: &str,
-) -> Option<Vec<String>> {
+) -> HashMap<String, Vec<String>> {
+    let mut map = HashMap::new();
     let mut queue = VecDeque::new();
+
+    // Start BFS from the root link. Its path is just [root_link] initially.
     queue.push_back((root_link.to_owned(), vec![root_link.to_owned()]));
 
     while let Some((cur_link, path_so_far)) = queue.pop_front() {
-        if cur_link == target {
-            return Some(path_so_far);
-        }
+        // Store the full path to `cur_link`.
+        map.insert(cur_link.clone(), path_so_far.clone());
+
+        // Enqueue child links, building extended paths.
         if let Some(kids) = adjacency.get(&cur_link) {
             for (j, c) in kids {
                 let mut new_path = path_so_far.clone();
@@ -47,16 +53,29 @@ pub fn get_link_chain(
             }
         }
     }
-    None
+
+    map
 }
 
-/// Convert a chain of links and joints into a slash-separated path of link names.
+/// Get the chain of links+joint-names for `target` link from the BFS map.
+/// Returns something like [rootLink, jointA, link2, jointB, targetLink].
+pub fn get_link_chain(
+    link_paths_map: &HashMap<String, Vec<String>>,
+    target: &str,
+) -> Option<Vec<String>> {
+    link_paths_map.get(target).cloned()
+}
+
+/// Convert a chain of [link, joint, link, joint, link, ...]
+/// into a slash-separated path *of link-names only*.
+/// Example:
+///   chain = [ "base_link", "joint1", "link2", "joint2", "hand" ]
+///   => we extract link indices (0, 2, 4, ...) => "base_link/link2/hand"
 pub fn link_entity_path(
-    adjacency: &HashMap<String, Vec<(Joint, String)>>,
-    root_link: &str,
+    link_paths_map: &HashMap<String, Vec<String>>,
     link_name: &str,
 ) -> Option<String> {
-    if let Some(chain) = get_link_chain(adjacency, root_link, link_name) {
+    if let Some(chain) = get_link_chain(link_paths_map, link_name) {
         let link_only: Vec<_> = chain
             .iter()
             .enumerate()
@@ -68,7 +87,8 @@ pub fn link_entity_path(
     }
 }
 
-/// Build a mapping from joint names to their corresponding entity paths.
+/// Build a mapping from joint names to their corresponding entity paths, using the BFS map
+/// rather than re-BFSing for each joint.
 pub fn build_joint_name_to_entity_path(urdf_path: &str) -> anyhow::Result<HashMap<String, String>> {
     // 1) Parse the URDF
     let robot_model = urdf_rs::read_file(urdf_path)?;
@@ -80,11 +100,14 @@ pub fn build_joint_name_to_entity_path(urdf_path: &str) -> anyhow::Result<HashMa
     let root_link_name = find_root_link_name(&robot_model.links, &robot_model.joints)
         .unwrap_or_else(|| "base".to_string());
 
-    // 4) For each joint, do a BFS to get the path of link-names only
+    // 4) Build a BFS-based map from link_name => chain
+    let link_paths_map = build_link_paths_map(&adjacency, &root_link_name);
+
+    // 5) For each joint, look up the path from root to `j.child.link`, 
+    //    extract only the link names, and insert into `map`.
     let mut map = HashMap::new();
     for j in &robot_model.joints {
-        // BFS from root_link_name -> j.child.link
-        if let Some(chain) = get_link_chain(&adjacency, &root_link_name, &j.child.link) {
+        if let Some(chain) = link_paths_map.get(&j.child.link) {
             // keep only even indices => link names
             let link_only: Vec<_> = chain
                 .iter()
@@ -95,5 +118,6 @@ pub fn build_joint_name_to_entity_path(urdf_path: &str) -> anyhow::Result<HashMa
             map.insert(j.name.clone(), path);
         }
     }
+
     Ok(map)
 }
