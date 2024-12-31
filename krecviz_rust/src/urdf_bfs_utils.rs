@@ -103,7 +103,7 @@ pub fn build_joint_name_to_entity_path(urdf_path: &str) -> anyhow::Result<HashMa
     // 4) Build a BFS-based map from link_name => chain
     let link_paths_map = build_link_paths_map(&adjacency, &root_link_name);
 
-    // 5) For each joint, look up the path from root to `j.child.link`, 
+    // 5) For each joint, look up the path from root to `j.child.link`,
     //    extract only the link names, and insert into `map`.
     let mut map = HashMap::new();
     for j in &robot_model.joints {

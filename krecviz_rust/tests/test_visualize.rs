@@ -1,11 +1,11 @@
 use anyhow::Result;
+use env_logger;
+use log::{debug, info};
 use std::collections::HashMap;
 use std::path::Path;
-use log::{debug, info};
-use env_logger;
 
 // Import the necessary functions from your crate
-use krecviz_rust::{parse_and_log_urdf_hierarchy};
+use krecviz_rust::parse_and_log_urdf_hierarchy;
 
 const BASE_PATH: &str = env!("CARGO_MANIFEST_DIR");
 const URDF_BASE_PATH: &str = "../tests/assets/urdf_examples";
@@ -67,14 +67,12 @@ fn build_urdf_paths() -> HashMap<&'static str, String> {
 //     Ok(())
 // }
 
-
 // #[test]
 // fn test_run_visualization_simple_adhoc() -> Result<()> {
 //     let rec = rerun::RecordingStreamBuilder::new("test_visualization_adhoc").spawn()?;
 //     parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["simple"], &rec)?;
 //     Ok(())
 // }
-
 
 #[test]
 fn test_run_manual_urdf_adhoc() -> Result<()> {
@@ -83,7 +81,6 @@ fn test_run_manual_urdf_adhoc() -> Result<()> {
     parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["manual_urdf"], &rec)?;
     Ok(())
 }
-
 
 // #[test]
 // fn test_run_visualization_simple_onshape_2_joints_adhoc() -> Result<()> {
@@ -117,5 +114,3 @@ fn test_run_manual_urdf_adhoc() -> Result<()> {
 //     parse_and_log_urdf_hierarchy(&EXAMPLE_URDF_PATHS["xbot"], &rec)?;
 //     Ok(())
 // }
-
-

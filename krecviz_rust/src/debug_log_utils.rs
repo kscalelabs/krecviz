@@ -1,8 +1,8 @@
 use crate::spatial_transform_utils::{build_4x4_from_xyz_rpy, mat4x4_mul};
 use crate::urdf_bfs_utils::{find_root_link_name, get_link_chain};
 use log::debug;
-use urdf_rs::Robot;
 use std::collections::HashMap;
+use urdf_rs::Robot;
 
 /// Print debug information about an actuator transform.
 pub fn debug_print_actuator_transform(
@@ -55,7 +55,10 @@ pub fn debug_print_joint_transform(
     rpy: [f64; 3],
 ) {
     debug!("rerun_log");
-    debug!("entity_path = entity_path_w_prefix with value '{}'", child_path);
+    debug!(
+        "entity_path = entity_path_w_prefix with value '{}'",
+        child_path
+    );
     debug!("Original joint RPY values:");
     debug!("  => rpy = [{:.3}, {:.3}, {:.3}]", rpy[0], rpy[1], rpy[2]);
 
@@ -67,7 +70,7 @@ pub fn debug_print_joint_transform(
         "  translation: ['{:>8.3}', '{:>8.3}', '{:>8.3}']",
         translation[0], translation[1], translation[2]
     );
-    
+
     debug!("  mat3x3:");
     for row_i in 0..3 {
         let start = row_i * 3;
@@ -82,10 +85,7 @@ pub fn debug_print_joint_transform(
 }
 
 /// Print the final accumulated transforms for each link in the robot.
-pub fn print_final_link_transforms(
-    robot: &Robot,
-    link_paths_map: &HashMap<String, Vec<String>>,
-) {
+pub fn print_final_link_transforms(robot: &Robot, link_paths_map: &HashMap<String, Vec<String>>) {
     if let Some(root_link) = find_root_link_name(&robot.links, &robot.joints) {
         debug!("\n========== FINAL ACCUMULATED TRANSFORMS PER LINK ==========");
         for link in &robot.links {

@@ -10,8 +10,7 @@ use rerun::{
     archetypes::{Mesh3D, Transform3D},
     components::{Position3D, TriangleIndices},
     datatypes::ImageFormat,
-    RecordingStream,
-    ViewCoordinates,
+    RecordingStream, ViewCoordinates,
 };
 use urdf_rs::{self, Geometry, Joint, Link, Material};
 
@@ -214,7 +213,7 @@ fn log_link_meshes_at_identity(
         rec.log(mesh_entity_path.as_str(), &mesh3d)?;
     }
 
-    // Log text summaries, useful for debugging 
+    // Log text summaries, useful for debugging
     // let doc_entity = format!("{}/text_summary", entity_path);
     // rec.log(doc_entity.as_str(), &TextDocument::new(doc_text))?;
 
@@ -284,8 +283,8 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
 
     // 2) Build adjacency and link paths map
     let adjacency = build_adjacency(&robot.joints);
-    let root_link_name = find_root_link_name(&robot.links, &robot.joints)
-        .unwrap_or_else(|| "base".to_string());
+    let root_link_name =
+        find_root_link_name(&robot.links, &robot.joints).unwrap_or_else(|| "base".to_string());
     let link_paths_map = build_link_paths_map(&adjacency, &root_link_name);
 
     println!("======================");
@@ -304,8 +303,8 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
     // 4) For each link, log geometry at identity
     for link in &robot.links {
         let link_name = &link.name;
-        let path = link_entity_path(&link_paths_map, link_name)
-            .unwrap_or_else(|| link_name.clone());
+        let path =
+            link_entity_path(&link_paths_map, link_name).unwrap_or_else(|| link_name.clone());
 
         log_link_meshes_at_identity(link, path.as_str(), &urdf_dir, &mat_map, rec)?;
     }
