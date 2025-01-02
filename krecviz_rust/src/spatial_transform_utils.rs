@@ -84,7 +84,9 @@ pub fn mat4x4_mul(a: [f32; 16], b: [f32; 16]) -> [f32; 16] {
 pub fn decompose_4x4_to_translation_and_mat3x3(tf: [f32; 16]) -> ([f32; 3], [f32; 9]) {
     let translation = [tf[3], tf[7], tf[11]];
     let mat3x3 = [
-        tf[0], tf[1], tf[2], tf[4], tf[5], tf[6], tf[8], tf[9], tf[10],
+        tf[0], tf[4], tf[8],    // First column
+        tf[1], tf[5], tf[9],    // Second column
+        tf[2], tf[6], tf[10],   // Third column
     ];
     (translation, mat3x3)
 }
