@@ -1,5 +1,7 @@
 use std::collections::{HashMap, HashSet, VecDeque};
 use urdf_rs::{Joint, Link};
+use anyhow::Result;
+use crate::spatial_transform_utils::rotation_from_euler_xyz;
 
 /// Build adjacency map from joints to their child links.
 pub fn build_adjacency(joints: &[Joint]) -> HashMap<String, Vec<(Joint, String)>> {
@@ -120,4 +122,65 @@ pub fn build_joint_name_to_entity_path(urdf_path: &str) -> anyhow::Result<HashMa
     }
 
     Ok(map)
+}
+
+pub fn build_joint_name_to_joint_info(urdf_path: &str) -> Result<HashMap<String, JointInfo>, anyhow::Error> {
+    // 1) Parse the URDF
+    let robot = urdf_rs::read_file(urdf_path)?;
+    
+    // 2) Build adjacency
+    let adjacency = build_adjacency(&robot.joints);
+
+    // 3) Find root link
+    let root_link_name = find_root_link_name(&robot.links, &robot.joints)
+        .unwrap_or_else(|| "base".to_string());
+
+    // 4) Build BFS-based map from link_name => chain
+    let link_paths_map = build_link_paths_map(&adjacency, &root_link_name);
+    
+    let mut joint_info_map = HashMap::new();
+    
+    // 5) For each joint, get the proper entity path and origin translation
+    for joint in &robot.joints {
+        // Get the proper entity path using our existing BFS logic
+        if let Some(chain) = link_paths_map.get(&joint.child.link) {
+            // Extract only the link names (even indices)
+            let link_only: Vec<_> = chain
+                .iter()
+                .enumerate()
+                .filter_map(|(i, nm)| if i % 2 == 0 { Some(nm.clone()) } else { None })
+                .collect();
+            
+            let entity_path = link_only.join("/");
+            
+            // Get the translation from the joint's origin
+            let translation = [
+                joint.origin.xyz[0] as f32,
+                joint.origin.xyz[1] as f32, 
+                joint.origin.xyz[2] as f32
+            ];
+            
+            let base_rotation = rotation_from_euler_xyz(
+                joint.origin.rpy[0],
+                joint.origin.rpy[1],
+                joint.origin.rpy[2]
+            );
+            
+            let info = JointInfo {
+                entity_path,
+                origin_translation: translation,
+                base_rotation,
+            };
+            
+            joint_info_map.insert(joint.name.clone(), info);
+        }
+    }
+    
+    Ok(joint_info_map)
+}
+
+pub struct JointInfo {
+    pub entity_path: String,
+    pub origin_translation: [f32; 3],
+    pub base_rotation: [f32; 9],
 }

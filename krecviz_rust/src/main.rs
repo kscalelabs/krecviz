@@ -14,8 +14,13 @@ mod urdf_logger;
 
 use debug_log_utils::debug_print_actuator_transform;
 use repl_utils::interactive_transform_repl;
-use spatial_transform_utils::{build_z_rotation_4x4, decompose_4x4_to_translation_and_mat3x3};
-use urdf_bfs_utils::build_joint_name_to_entity_path;
+use spatial_transform_utils::{
+    build_z_rotation_3x3,
+    make_4x4_from_rotation_and_translation,
+    decompose_4x4_to_translation_and_mat3x3,
+    mat3x3_mul
+};
+use urdf_bfs_utils::{build_joint_name_to_entity_path, build_joint_name_to_joint_info};
 use urdf_logger::parse_and_log_urdf_hierarchy;
 
 // KREC crate: adjust your path/names if needed!
@@ -145,6 +150,12 @@ fn main() -> Result<()> {
         // We'll replicate the python actuator->joint map
         let actuator_map = build_actuator_to_urdf_joint_map();
 
+        let joint_info_map = if let Some(urdf_path) = &args.urdf {
+            build_joint_name_to_joint_info(urdf_path)?
+        } else {
+            HashMap::new()
+        };
+
         // 4) Iterate frames
         for (frame_idx, frame) in loaded_krec.frames.iter().enumerate() {
             // Set Rerun time-sequence so transforms appear “animated”
@@ -154,19 +165,31 @@ fn main() -> Result<()> {
             for state in &frame.actuator_states {
                 let actuator_id = state.actuator_id;
                 if let Some(joint_name) = actuator_map.get(&actuator_id) {
-                    if let Some(entity_path) = joint_name_to_entity_path.get(*joint_name) {
+                    if let Some(joint_info) = joint_info_map.get(*joint_name) {
                         if let Some(pos_deg) = state.position {
                             let angle_rad = pos_deg * (PI / 180.0);
-                            let tf4x4 = build_z_rotation_4x4(angle_rad);
-                            let (translation, mat3x3) =
-                                decompose_4x4_to_translation_and_mat3x3(tf4x4);
+                            
+                            // First build the new rotation (3x3)
+                            let new_rotation = build_z_rotation_3x3(angle_rad);
+                            
+                            // Multiply with base rotation (3x3)
+                            let final_rotation = mat3x3_mul(joint_info.base_rotation, new_rotation);
+                            
+                            // Make 4x4 matrix with rotation and translation
+                            let tf4x4 = make_4x4_from_rotation_and_translation(
+                                final_rotation,
+                                joint_info.origin_translation
+                            );
+                            
+                            // Now decompose (this will handle the row->column major conversion)
+                            let (translation, mat3x3) = decompose_4x4_to_translation_and_mat3x3(tf4x4);
 
                             // Use helper function to print debug info
                             debug_print_actuator_transform(
                                 frame_idx,
                                 actuator_id,
                                 joint_name,
-                                entity_path,
+                                &joint_info.entity_path,
                                 pos_deg,
                                 angle_rad,
                                 tf4x4,
@@ -178,7 +201,7 @@ fn main() -> Result<()> {
                             let tf = rerun::archetypes::Transform3D::from_translation(translation)
                                 .with_mat3x3(mat3x3);
 
-                            rec.log(entity_path.clone(), &tf)?;
+                            rec.log(&*joint_info.entity_path, &tf)?;
                         }
                     }
                 }

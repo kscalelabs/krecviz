@@ -97,3 +97,25 @@ pub fn identity_4x4() -> [f32; 16] {
         1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
     ]
 }
+
+/// Build a 3×3 rotation matrix that just rotates around Z
+pub fn build_z_rotation_3x3(angle_rad: f64) -> [f32; 9] {
+    let cz = angle_rad.cos() as f32;
+    let sz = angle_rad.sin() as f32;
+
+    [
+        cz, -sz, 0.0,  // First row
+        sz,  cz, 0.0,  // Second row
+        0.0, 0.0, 1.0, // Third row
+    ]
+}
+
+/// Convert rotation matrix and translation into a 4x4 transform matrix
+pub fn make_4x4_from_rotation_and_translation(rotation: [f32; 9], translation: [f32; 3]) -> [f32; 16] {
+    [
+        rotation[0], rotation[1], rotation[2], translation[0],
+        rotation[3], rotation[4], rotation[5], translation[1],
+        rotation[6], rotation[7], rotation[8], translation[2],
+        0.0, 0.0, 0.0, 1.0,
+    ]
+}
