@@ -122,13 +122,10 @@ fn main() -> Result<()> {
     Builder::from_env(Env::default().default_filter_or("krecviz_rust=debug")).init();
 
     // Show the parsed CLI args
-    let args = dbg!(Args::parse());
+    let args = Args::parse();
 
     // 1) Start a Rerun recording
-    let rec = dbg!(rerun::RecordingStreamBuilder::new(
-        "rust_krecviz_hierarchy_example"
-    ))
-    .spawn()?;
+    let rec = rerun::RecordingStreamBuilder::new("rust_krecviz_hierarchy_example").spawn()?;
 
     // 2) If we have a URDF, parse & log it hierarchically
     if let Some(urdf_path) = &args.urdf {

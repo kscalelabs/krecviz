@@ -72,19 +72,15 @@ pub fn log_link_meshes_at_identity(
         }
 
         // Build geometry info
-        let (mut mesh3d, info_txt) = match &vis.geometry {
+        let mut mesh3d = match &vis.geometry {
             Geometry::Mesh { filename, scale } => {
                 let joined = urdf_dir.join(filename);
                 // canonicalize will remove things like "../"
                 let abs_path = match fs::canonicalize(&joined) {
                     Ok(resolved) => resolved,
-                    Err(_) => {
-                        // If canonicalize fails (e.g. file not found),
-                        // use joined as fallback
-                        joined
-                    }
+                    Err(_) => joined, // If canonicalize fails, use joined as fallback
                 };
-                let mut info_txt = format!("Mesh file={:?}, scale={:?}\n", abs_path, scale);
+                
                 if abs_path
                     .extension()
                     .and_then(|e| e.to_str())
@@ -93,20 +89,19 @@ pub fn log_link_meshes_at_identity(
                     == Some("stl")
                 {
                     match load_stl_as_mesh3d(&abs_path) {
-                        Ok(m) => (m, info_txt),
+                        Ok(m) => m,
                         Err(e) => {
-                            info_txt.push_str(&format!("(Error loading STL: {e})\n"));
-                            (Mesh3D::new(Vec::<[f32; 3]>::new()), info_txt)
+                            eprintln!("Error loading STL {abs_path:?}: {e}");
+                            Mesh3D::new(Vec::<[f32; 3]>::new())
                         }
                     }
                 } else {
-                    info_txt.push_str("(Currently only .stl handled)\n");
-                    (Mesh3D::new(Vec::<[f32; 3]>::new()), info_txt)
+                    eprintln!("Currently only .stl files are handled: {abs_path:?}");
+                    Mesh3D::new(Vec::<[f32; 3]>::new())
                 }
             }
             Geometry::Box { size } => {
                 let (sx, sy, sz) = (size[0], size[1], size[2]);
-                let info_txt = format!("Box size=({},{},{})\n", sx, sy, sz);
                 let cuboid = ParryCuboid::new(na::Vector3::new(
                     (sx / 2.0) as f32,
                     (sy / 2.0) as f32,
@@ -126,11 +121,9 @@ pub fn log_link_meshes_at_identity(
 
                 // compute normals
                 compute_vertex_normals(&mut mesh);
-
-                (mesh, info_txt)
+                mesh
             }
             Geometry::Cylinder { radius, length } => {
-                let info_txt = format!("Cylinder r={}, length={}\n", radius, length);
                 let half = (*length as f32) / 2.0;
                 let cyl = ParryCylinder::new(half, *radius as f32);
                 let (raw_v, raw_i) = cyl.to_trimesh(30);
@@ -153,11 +146,9 @@ pub fn log_link_meshes_at_identity(
 
                 // now compute normals
                 compute_vertex_normals(&mut mesh);
-
-                (mesh, info_txt)
+                mesh
             }
             Geometry::Sphere { radius } => {
-                let info_txt = format!("Sphere radius={}\n", radius);
                 let ball = ParrySphere::new(*radius as f32);
                 let (raw_v, raw_i) = ball.to_trimesh(20, 20);
                 let positions: Vec<Position3D> = raw_v
@@ -172,12 +163,11 @@ pub fn log_link_meshes_at_identity(
 
                 // compute normals
                 compute_vertex_normals(&mut mesh);
-
-                (mesh, info_txt)
+                mesh
             }
             _ => {
-                let info_txt = String::from("(Unsupported geometry)\n");
-                (Mesh3D::new(Vec::<[f32; 3]>::new()), info_txt)
+                eprintln!("Unsupported geometry type");
+                Mesh3D::new(Vec::<[f32; 3]>::new())
             }
         };
 
