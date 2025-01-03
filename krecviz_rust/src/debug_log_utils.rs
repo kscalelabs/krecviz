@@ -1,8 +1,9 @@
 use crate::spatial_transform_utils::{build_4x4_from_xyz_rpy, mat4x4_mul};
-use crate::urdf_bfs_utils::{find_root_link_name, get_link_chain};
+use crate::urdf_bfs_utils::{find_root_link_name, LinkBfsData};
 use log::debug;
 use std::collections::HashMap;
 use urdf_rs::Robot;
+use urdf_rs::Link;
 
 /// Print debug information about an actuator transform.
 pub fn debug_print_actuator_transform(
@@ -105,7 +106,7 @@ pub fn debug_print_joint_transform(
 }
 
 /// Print the final accumulated transforms for each link in the robot.
-pub fn print_final_link_transforms(robot: &Robot, link_paths_map: &HashMap<String, Vec<String>>) {
+pub fn print_final_link_transforms(robot: &Robot, link_bfs_map: &HashMap<String, LinkBfsData>) {
     debug!("=== print_final_link_transforms ===");
     if let Some(root_link) = find_root_link_name(&robot.links, &robot.joints) {
         debug!("========== FINAL ACCUMULATED TRANSFORMS PER LINK ==========");
@@ -117,31 +118,10 @@ pub fn print_final_link_transforms(robot: &Robot, link_paths_map: &HashMap<Strin
                 );
                 continue;
             }
-            if let Some(chain) = get_link_chain(link_paths_map, &link.name) {
-                let mut final_tf = [
-                    1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-                ];
-                let mut i = 1;
-                while i < chain.len() {
-                    let joint_name = &chain[i];
-                    i += 1;
-                    let j = robot.joints.iter().find(|jj| jj.name == *joint_name);
-                    if let Some(joint) = j {
-                        let x = joint.origin.xyz[0];
-                        let y = joint.origin.xyz[1];
-                        let z = joint.origin.xyz[2];
-                        let rr = joint.origin.rpy[0];
-                        let pp = joint.origin.rpy[1];
-                        let yy = joint.origin.rpy[2];
-
-                        let local_tf_4x4 = build_4x4_from_xyz_rpy([x, y, z], [rr, pp, yy]);
-                        final_tf = mat4x4_mul(final_tf, local_tf_4x4);
-                    }
-                    i += 1;
-                }
-
-                debug!("Link '{}': BFS chain = {:?}", link.name, chain);
+            if let Some(link_data) = link_bfs_map.get(&link.name) {
+                debug!("Link '{}': BFS chain = {:?}", link.name, link_data.link_full_path);
                 debug!("  => final_tf (4x4) =");
+                let final_tf = link_data.global_transform;
                 for row_i in 0..4 {
                     let base = row_i * 4;
                     debug!(
@@ -168,68 +148,44 @@ pub fn debug_print_transform_chain(
     debug!("=== debug_print_transform_chain ===");
     debug!("Transform chain so far:");
     debug!("  {}", bfs_chain_for_debug[..=i].join(" -> "));
-
-    debug!("Local transform matrix:");
-    for row in 0..4 {
-        let row_str = format!(
-            "  [{:7.3}, {:7.3}, {:7.3}, {:7.3}]",
-            (local_tf_4x4[row * 4 + 0] * 1000.0).round() / 1000.0,
-            (local_tf_4x4[row * 4 + 1] * 1000.0).round() / 1000.0,
-            (local_tf_4x4[row * 4 + 2] * 1000.0).round() / 1000.0,
-            (local_tf_4x4[row * 4 + 3] * 1000.0).round() / 1000.0
+    
+    debug!("Local transform (4x4):");
+    for row_i in 0..4 {
+        let base = row_i * 4;
+        debug!(
+            "  [{:8.3} {:8.3} {:8.3} {:8.3}]",
+            local_tf_4x4[base + 0],
+            local_tf_4x4[base + 1],
+            local_tf_4x4[base + 2],
+            local_tf_4x4[base + 3]
         );
-        debug!("{}", row_str);
     }
-
-    debug!("Accumulated global transform:");
-    for row in 0..4 {
-        let row_str = format!(
-            "  [{:7.3}, {:7.3}, {:7.3}, {:7.3}]",
-            (global_tf[row * 4 + 0] * 1000.0).round() / 1000.0,
-            (global_tf[row * 4 + 1] * 1000.0).round() / 1000.0,
-            (global_tf[row * 4 + 2] * 1000.0).round() / 1000.0,
-            (global_tf[row * 4 + 3] * 1000.0).round() / 1000.0
+    
+    debug!("Global transform (4x4):");
+    for row_i in 0..4 {
+        let base = row_i * 4;
+        debug!(
+            "  [{:8.3} {:8.3} {:8.3} {:8.3}]",
+            global_tf[base + 0],
+            global_tf[base + 1],
+            global_tf[base + 2],
+            global_tf[base + 3]
         );
-        debug!("{}", row_str);
     }
-    debug!("");
 }
 
 /// Print debug information about link transforms and mesh paths
 pub fn debug_print_link_transform_info(
     link_name: &str,
     bfs_chain: &[String],
-    final_tf: [f32; 16],
-    mesh_entity_path: &str,
+    _tf4x4: [f32; 16],
+    entity_path: &str,
     rpy: [f64; 3],
 ) {
     debug!("=== debug_print_link_transform_info ===");
-    debug!("");
-    debug!("Link '{link_name}': BFS chain = {:?}", bfs_chain);
-    debug!("  => final_tf (4x4) =");
-    for row_i in 0..4 {
-        let base = row_i * 4;
-        debug!(
-            "  [{:8.3} {:8.3} {:8.3} {:8.3}]",
-            final_tf[base + 0],
-            final_tf[base + 1],
-            final_tf[base + 2],
-            final_tf[base + 3],
-        );
-    }
-    debug!("");
-    debug!("entity_path = '{mesh_entity_path}'");
-    debug!("Original joint RPY values:");
-    debug!("  => rpy = [{:.3}, {:.3}, {:.3}]", rpy[0], rpy[1], rpy[2]);
-
-    let (translation, _mat3x3) =
-        crate::spatial_transform_utils::decompose_4x4_to_translation_and_mat3x3(final_tf);
-    debug!("entity = rr.Transform3D with:");
-    debug!(
-        "  translation: ['{:>8.3}', '{:>8.3}', '{:>8.3}']",
-        translation[0], translation[1], translation[2]
-    );
-    debug!("");
+    debug!("Link '{}' => entity_path '{}'", link_name, entity_path);
+    debug!("BFS chain: {:?}", bfs_chain);
+    debug!("RPY: {:?}", rpy);
 }
 
 /// Print detailed debug information about BFS joint transforms including parent and child transforms
@@ -307,4 +263,11 @@ pub fn debug_print_bfs_joint_transforms(
     );
     debug!("   mat3x3={:?}", mat3x3);
     debug!("==============================================================\n");
+}
+
+/// Print debug information about link transforms and mesh paths
+pub fn debug_print_link_info(link: &Link, link_bfs_map: &HashMap<String, LinkBfsData>) {
+    if let Some(link_data) = link_bfs_map.get(&link.name) {
+        debug!("Link '{}' => path: {}", link.name, link_data.link_full_path);
+    }
 }

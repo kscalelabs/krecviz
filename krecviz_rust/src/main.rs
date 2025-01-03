@@ -20,7 +20,7 @@ use spatial_transform_utils::{
     decompose_4x4_to_translation_and_mat3x3,
     mat3x3_mul
 };
-use urdf_bfs_utils::{build_joint_name_to_entity_path, build_joint_name_to_joint_info};
+use urdf_bfs_utils::build_joint_name_to_joint_info;
 use urdf_logger::parse_and_log_urdf_hierarchy;
 
 // KREC crate: adjust your path/names if needed!
@@ -127,15 +127,9 @@ fn main() -> Result<()> {
     .spawn()?;
 
     // 2) If we have a URDF, parse & log it hierarchically
-    let mut joint_name_to_entity_path = HashMap::new();
     if let Some(urdf_path) = &args.urdf {
         dbg!(urdf_path);
-        // Log geometry + BFS transforms (stage1/stage2) from urdf_logger
         parse_and_log_urdf_hierarchy(urdf_path, &rec)?;
-
-        // Also build the BFS-based map from each joint's name => "link-only" path
-        // (this is used later to animate transforms from the KREC data)
-        joint_name_to_entity_path = build_joint_name_to_entity_path(urdf_path)?;
     } else {
         dbg!("No URDF path provided, logging a fallback message.");
         rec.log("/urdf_info", &rerun::TextDocument::new("No URDF provided"))?;
