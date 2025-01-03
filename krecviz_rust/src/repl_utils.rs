@@ -1,6 +1,7 @@
 use crate::spatial_transform_utils::{
     build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3,
 };
+use crate::debug_log_utils::debug_log_rerun_transform;
 use anyhow::Result;
 use rerun::RecordingStream;
 use std::io::{self, BufRead, Write};
@@ -99,6 +100,16 @@ pub fn interactive_transform_repl(rec: &RecordingStream) -> Result<()> {
         // Build a 4x4
         let transform_4x4 = build_4x4_from_xyz_rpy([tx, ty, tz], [roll, pitch, yaw]);
         let (translation_f32, mat3x3_f32) = decompose_4x4_to_translation_and_mat3x3(transform_4x4);
+
+        // Debug print before logging
+        debug_log_rerun_transform(
+            path,
+            None,  // No BFS data in REPL
+            [roll_deg, pitch_deg, yaw_deg],
+            translation_f32,
+            mat3x3_f32,
+            "REPL interactive transform"
+        );
 
         // Log it to Rerun
         let transform_3d = rerun::archetypes::Transform3D::from_translation(translation_f32)

@@ -5,6 +5,7 @@ use anyhow::Result;
 use crate::spatial_transform_utils::{
     mat4x4_mul, identity_4x4, build_4x4_from_xyz_rpy, rotation_from_euler_xyz
 };
+use crate::debug_log_utils::debug_log_bfs_insertion;
 
 /// Complete information about a link's position in the hierarchy and transforms
 #[derive(Debug, Clone)]
@@ -140,6 +141,7 @@ pub fn build_link_bfs_map(robot: &Robot) -> HashMap<String, LinkBfsData> {
                     global_transform: child_global_tf,
                 };
 
+                debug_log_bfs_insertion(&child_data);
                 link_bfs_map.insert(child_link_name.clone(), child_data);
                 queue.push_back(child_link_name.clone());
             }

@@ -12,7 +12,8 @@ mod spatial_transform_utils;
 mod urdf_bfs_utils;
 mod urdf_logger;
 
-use debug_log_utils::debug_print_actuator_transform;
+use debug_log_utils::debug_log_rerun_transform;
+use debug_log_utils::debug_log_actuator_state;
 use repl_utils::interactive_transform_repl;
 use spatial_transform_utils::{
     build_z_rotation_3x3,
@@ -68,6 +69,9 @@ fn log_actuator_states(
     velocity: Option<f64>,
     torque: Option<f64>,
 ) -> Result<()> {
+    // Add debug logging
+    debug_log_actuator_state(frame_idx, actuator_id, position, velocity, torque);
+
     rec.set_time_sequence("frame_idx", frame_idx as i64);
 
     let base_path = format!("actuators/actuator_{}/state", actuator_id);
@@ -132,7 +136,7 @@ fn main() -> Result<()> {
         parse_and_log_urdf_hierarchy(urdf_path, &rec)?;
     } else {
         dbg!("No URDF path provided, logging a fallback message.");
-        rec.log("/urdf_info", &rerun::TextDocument::new("No URDF provided"))?;
+        rec.log("/no_urdf_found", &rerun::TextDocument::new("No URDF provided"))?;
     }
 
     // 3) If we have a KREC, load it
@@ -178,23 +182,18 @@ fn main() -> Result<()> {
                             // Now decompose (this will handle the row->column major conversion)
                             let (translation, mat3x3) = decompose_4x4_to_translation_and_mat3x3(tf4x4);
 
-                            // Use helper function to print debug info
-                            debug_print_actuator_transform(
-                                frame_idx,
-                                actuator_id,
-                                joint_name,
-                                &joint_info.entity_path,
-                                pos_deg,
-                                angle_rad,
-                                tf4x4,
-                                translation,
-                                mat3x3,
-                            );
-
                             // Log the transform
                             let tf = rerun::archetypes::Transform3D::from_translation(translation)
                                 .with_mat3x3(mat3x3);
 
+                            debug_log_rerun_transform(
+                                &joint_info.entity_path,
+                                None,  // No BFS data for actuator transforms
+                                [0.0, 0.0, angle_rad],  // Only rotation around Z
+                                translation,
+                                mat3x3,
+                                "Actuator animation transform"
+                            );
                             rec.log(&*joint_info.entity_path, &tf)?;
                         }
                     }

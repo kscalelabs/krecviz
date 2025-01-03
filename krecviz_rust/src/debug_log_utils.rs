@@ -1,273 +1,162 @@
-use crate::spatial_transform_utils::{build_4x4_from_xyz_rpy, mat4x4_mul};
-use crate::urdf_bfs_utils::{find_root_link_name, LinkBfsData};
+use crate::urdf_bfs_utils::LinkBfsData;
 use log::debug;
-use std::collections::HashMap;
-use urdf_rs::Robot;
-use urdf_rs::Link;
+use rerun::components::Position3D;
+use urdf_rs::Vec3;
 
-/// Print debug information about an actuator transform.
-pub fn debug_print_actuator_transform(
-    frame_idx: usize,
-    actuator_id: u32,
-    joint_name: &str,
-    entity_path: &str,
-    pos_deg: f64,
-    angle_rad: f64,
-    tf4x4: [f32; 16],
+/// A small helper that prints a standard header/log info:
+/// - A title (e.g. "debug_log_rerun_transform")
+/// - A reason (e.g. "Stage2 BFS apply transform")
+/// - The entity path, if any
+/// - The link's BFS info, if provided
+fn debug_common_header(
+    title: &str,
+    label: &str,
+    entity_path: Option<&str>,
+    link_data: Option<&LinkBfsData>,
+) {
+    debug!("=== {} ===", title);
+    debug!("Label: {}", label);
+
+    if let Some(path) = entity_path {
+        debug!("Entity path: '{}'", path);
+    }
+
+    if let Some(ld) = link_data {
+        debug!("Link name:       '{}'", ld.link_name);
+        debug!("Link-only path:  '{}'", ld.link_only_path);
+        debug!("Link-full path:  '{}'", ld.link_full_path);
+    }
+}
+
+/// Print debug information about a link being inserted during BFS traversal
+pub fn debug_log_bfs_insertion(child_data: &LinkBfsData) {
+    // BFS insertion usually doesn't have an "entity path" like rec.log
+    // so we pass None here.
+    debug_common_header(
+        "debug_log_bfs_insertion",
+        "BFS insertion",
+        None,                 // no entity_path
+        Some(child_data),
+    );
+
+    debug!(
+        "local RPY: [{:.3}, {:.3}, {:.3}]",
+        child_data.local_rpy[0],
+        child_data.local_rpy[1],
+        child_data.local_rpy[2]
+    );
+    debug!(
+        "local XYZ: [{:.3}, {:.3}, {:.3}]",
+        child_data.local_translation[0],
+        child_data.local_translation[1],
+        child_data.local_translation[2]
+    );
+    debug!("---------------------------------------\n");
+}
+
+/// Print debug information about a Transform3D before logging it to Rerun
+pub fn debug_log_rerun_transform(
+    entity_path: &str, 
+    link_data: Option<&LinkBfsData>, 
+    original_rpy: [f64; 3],
     translation: [f32; 3],
     mat3x3: [f32; 9],
+    label: &str
 ) {
-    debug!(
-        "=== debug_print_actuator_transform [Frame {}] ===",
-        frame_idx
+    // We do have an entity_path here, so we pass Some(entity_path).
+    debug_common_header(
+        "debug_log_rerun_transform",
+        label,
+        Some(entity_path),
+        link_data,
     );
-    debug!("Actuator ID: {}", actuator_id);
-    debug!("Joint Name:  '{}'", joint_name);
-    debug!("Entity Path: '{}'", entity_path);
-    debug!("Angle: {:.3}° ({:.3} rad)", pos_deg, angle_rad);
 
-    debug!("Decomposed Transform:");
     debug!(
-        "  Translation: [{:8.3}, {:8.3}, {:8.3}]",
+        "Original RPY:    [{:.3}, {:.3}, {:.3}]",
+        original_rpy[0], original_rpy[1], original_rpy[2]
+    );
+    debug!(
+        "Final translation: [{:.3}, {:.3}, {:.3}]",
         translation[0], translation[1], translation[2]
     );
 
-    debug!("  Rotation Matrix (3x3):");
+    debug!("Rotation Matrix (3x3):");
     for row in 0..3 {
         let idx = row * 3;
         debug!(
-            "    [{:8.3} {:8.3} {:8.3}]",
+            "  [{:8.3}, {:8.3}, {:8.3}]",
             mat3x3[idx],
             mat3x3[idx + 1],
             mat3x3[idx + 2]
         );
     }
-    debug!("=====================================\n");
+    debug!("======================================\n");
 }
 
-/// Print debug information about loading an STL file.
-pub fn debug_print_stl_load(abs_path: &std::path::Path) {
-    debug!("=== debug_print_stl_load ===");
-    debug!("Loading STL file: {:?}", abs_path);
-}
-
-/// Print debug information about rerun logging a mesh.
-pub fn debug_print_mesh_log(entity_path: &str, mesh: &rerun::archetypes::Mesh3D) {
-    debug!("=== debug_print_mesh_log ===");
-    debug!("======================");
-    debug!("rerun_log log_trimesh");
-    debug!("entity_path = '{entity_path}'");
-    debug!("entity = rr.Mesh3D(...) with these numeric values:");
-    debug!("  => vertex_positions (first 3):");
-    for v in mesh.vertex_positions.iter().take(3) {
-        debug!("      [{:>7.3}, {:>7.3}, {:>7.3}]", v[0], v[1], v[2]);
-    }
-    let timeless_val = true;
-    debug!("timeless = {timeless_val}");
-}
-
-/// Print debug information about applying a joint transform.
-pub fn debug_print_joint_transform(
-    _joint_name: &str,
-    _child_link: &str,
-    local_tf_4x4: [f32; 16],
-    child_path: &str,
-    rpy: [f64; 3],
+/// Print debug information about a Mesh3D before logging it to Rerun
+pub fn debug_log_rerun_mesh(
+    entity_path: &str,
+    link_data: Option<&LinkBfsData>,
+    origin_rpy: Vec3,
+    origin_xyz: Vec3,
+    vertex_positions: &[Position3D],
+    label: &str,
 ) {
-    debug!("=== debug_print_joint_transform ===");
-    debug!("rerun_log");
-    debug!(
-        "entity_path = entity_path_w_prefix with value '{}'",
-        child_path
-    );
-    debug!("Original joint RPY values:");
-    debug!("  => rpy = [{:.3}, {:.3}, {:.3}]", rpy[0], rpy[1], rpy[2]);
-
-    let (translation, mat3x3) =
-        crate::spatial_transform_utils::decompose_4x4_to_translation_and_mat3x3(local_tf_4x4);
-
-    debug!("entity = rr.Transform3D with:");
-    debug!(
-        "  translation: ['{:>8.3}', '{:>8.3}', '{:>8.3}']",
-        translation[0], translation[1], translation[2]
+    // Same approach: we do have an entity path, so Some(entity_path).
+    debug_common_header(
+        "debug_log_rerun_mesh",
+        label,
+        Some(entity_path),
+        link_data,
     );
 
-    debug!("  mat3x3:");
-    for row_i in 0..3 {
-        let start = row_i * 3;
-        debug!(
-            "    [{:>8.3}, {:>8.3}, {:>8.3}]",
-            mat3x3[start],
-            mat3x3[start + 1],
-            mat3x3[start + 2]
-        );
-    }
-    debug!("======================");
-}
+    debug!(
+        "Original RPY: [{:.3}, {:.3}, {:.3}]",
+        origin_rpy[0], origin_rpy[1], origin_rpy[2]
+    );
+    debug!(
+        "Original XYZ: [{:.3}, {:.3}, {:.3}]",
+        origin_xyz[0], origin_xyz[1], origin_xyz[2]
+    );
 
-/// Print the final accumulated transforms for each link in the robot.
-pub fn print_final_link_transforms(robot: &Robot, link_bfs_map: &HashMap<String, LinkBfsData>) {
-    debug!("=== print_final_link_transforms ===");
-    if let Some(root_link) = find_root_link_name(&robot.links, &robot.joints) {
-        debug!("========== FINAL ACCUMULATED TRANSFORMS PER LINK ==========");
-        for link in &robot.links {
-            if link.name == root_link {
-                debug!(
-                    "Link '{}': Root link => final transform is identity.\n",
-                    link.name
-                );
-                continue;
-            }
-            if let Some(link_data) = link_bfs_map.get(&link.name) {
-                debug!("Link '{}': BFS chain = {:?}", link.name, link_data.link_full_path);
-                debug!("  => final_tf (4x4) =");
-                let final_tf = link_data.global_transform;
-                for row_i in 0..4 {
-                    let base = row_i * 4;
-                    debug!(
-                        "  [{:8.3} {:8.3} {:8.3} {:8.3}]",
-                        final_tf[base + 0],
-                        final_tf[base + 1],
-                        final_tf[base + 2],
-                        final_tf[base + 3]
-                    );
-                }
-                debug!("");
+    let n_verts = vertex_positions.len();
+    debug!("Number of mesh vertices: {}", n_verts);
+
+    if n_verts > 0 {
+        debug!("First 3 vertex positions:");
+        for v in vertex_positions.iter().take(3) {
+            debug!("   [{:.3}, {:.3}, {:.3}]", v[0], v[1], v[2]);
+        }
+        if n_verts > 3 {
+            debug!("Last 3 vertex positions:");
+            for v in vertex_positions.iter().skip(n_verts.saturating_sub(3)) {
+                debug!("   [{:.3}, {:.3}, {:.3}]", v[0], v[1], v[2]);
             }
         }
     }
+
+    debug!("======================================\n");
 }
 
-/// Print debug information about transform chain and matrices
-pub fn debug_print_transform_chain(
-    bfs_chain_for_debug: &[String],
-    i: usize,
-    local_tf_4x4: [f32; 16],
-    global_tf: [f32; 16],
+/// Print debug information about actuator states being logged to Rerun
+pub fn debug_log_actuator_state(
+    frame_idx: usize,
+    actuator_id: u32,
+    position: Option<f64>,
+    velocity: Option<f64>,
+    torque: Option<f64>,
 ) {
-    debug!("=== debug_print_transform_chain ===");
-    debug!("Transform chain so far:");
-    debug!("  {}", bfs_chain_for_debug[..=i].join(" -> "));
-    
-    debug!("Local transform (4x4):");
-    for row_i in 0..4 {
-        let base = row_i * 4;
-        debug!(
-            "  [{:8.3} {:8.3} {:8.3} {:8.3}]",
-            local_tf_4x4[base + 0],
-            local_tf_4x4[base + 1],
-            local_tf_4x4[base + 2],
-            local_tf_4x4[base + 3]
-        );
-    }
-    
-    debug!("Global transform (4x4):");
-    for row_i in 0..4 {
-        let base = row_i * 4;
-        debug!(
-            "  [{:8.3} {:8.3} {:8.3} {:8.3}]",
-            global_tf[base + 0],
-            global_tf[base + 1],
-            global_tf[base + 2],
-            global_tf[base + 3]
-        );
-    }
-}
-
-/// Print debug information about link transforms and mesh paths
-pub fn debug_print_link_transform_info(
-    link_name: &str,
-    bfs_chain: &[String],
-    _tf4x4: [f32; 16],
-    entity_path: &str,
-    rpy: [f64; 3],
-) {
-    debug!("=== debug_print_link_transform_info ===");
-    debug!("Link '{}' => entity_path '{}'", link_name, entity_path);
-    debug!("BFS chain: {:?}", bfs_chain);
-    debug!("RPY: {:?}", rpy);
-}
-
-/// Print detailed debug information about BFS joint transforms including parent and child transforms
-pub fn debug_print_bfs_joint_transforms(
-    chain_str: &str,
-    parent: &str,
-    child_link: &str,
-    rpy: [f64; 3],
-    xyz: [f64; 3],
-    parent_accum: [f32; 16],
-    local_tf_4x4: [f32; 16],
-    child_accum: [f32; 16],
-    local_translation: [f32; 3],
-    local_mat3x3: [f32; 9],
-) {
-    debug!("=== debug_print_bfs_joint_transforms ===");
-    debug!("================== BFS Joint Transform Debug ==================");
-    debug!("BFS chain (entity path) = '{}'", chain_str);
-    debug!("Parent link='{}', child link='{}'", parent, child_link);
-    debug!(
-        "Original joint RPY = [{:.3}, {:.3}, {:.3}]",
-        rpy[0], rpy[1], rpy[2]
-    );
-    debug!(
-        "Original joint XYZ = [{:.3}, {:.3}, {:.3}]",
-        xyz[0], xyz[1], xyz[2]
+    debug_common_header(
+        "debug_log_actuator_state",
+        "Actuator state logging",
+        None,
+        None,
     );
 
-    debug!("--- Parent accum transform (root->parent):");
-    for row_i in 0..4 {
-        debug!(
-            "  [{:8.3}, {:8.3}, {:8.3}, {:8.3}]",
-            parent_accum[row_i * 4 + 0],
-            parent_accum[row_i * 4 + 1],
-            parent_accum[row_i * 4 + 2],
-            parent_accum[row_i * 4 + 3],
-        );
-    }
-
-    debug!("--- Local joint transform (parent->child):");
-    for row_i in 0..4 {
-        debug!(
-            "  [{:8.3}, {:8.3}, {:8.3}, {:8.3}]",
-            local_tf_4x4[row_i * 4 + 0],
-            local_tf_4x4[row_i * 4 + 1],
-            local_tf_4x4[row_i * 4 + 2],
-            local_tf_4x4[row_i * 4 + 3],
-        );
-    }
-
-    debug!("--- child_accum (root->child):");
-    for row_i in 0..4 {
-        debug!(
-            "  [{:8.3}, {:8.3}, {:8.3}, {:8.3}]",
-            child_accum[row_i * 4 + 0],
-            child_accum[row_i * 4 + 1],
-            child_accum[row_i * 4 + 2],
-            child_accum[row_i * 4 + 3],
-        );
-    }
-
-    debug!("--- Will log to Rerun => local_tf (since we only pass local offset here) :");
-    debug!(
-        "    local translation = [{:.3}, {:.3}, {:.3}]",
-        local_translation[0], local_translation[1], local_translation[2]
-    );
-    debug!("    local rotation 3x3 = {:?}", local_mat3x3);
-
-    let (translation, mat3x3) =
-        crate::spatial_transform_utils::decompose_4x4_to_translation_and_mat3x3(local_tf_4x4);
-    debug!("Now rec.log('{}', &tf) => That transform3D is:", chain_str);
-    debug!(
-        "   translation=[{:.3}, {:.3}, {:.3}]",
-        translation[0], translation[1], translation[2]
-    );
-    debug!("   mat3x3={:?}", mat3x3);
-    debug!("==============================================================\n");
-}
-
-/// Print debug information about link transforms and mesh paths
-pub fn debug_print_link_info(link: &Link, link_bfs_map: &HashMap<String, LinkBfsData>) {
-    if let Some(link_data) = link_bfs_map.get(&link.name) {
-        debug!("Link '{}' => path: {}", link.name, link_data.link_full_path);
-    }
+    debug!("Frame index: {:>6}", frame_idx);
+    debug!("Actuator ID: {:>6}", actuator_id);
+    debug!("Position:   {:>9.3} deg", position.unwrap_or(f64::NAN));
+    debug!("Velocity:   {:>9.3} deg/s", velocity.unwrap_or(f64::NAN));
+    debug!("Torque:     {:>9.3} Nm", torque.unwrap_or(f64::NAN));
+    debug!("---------------------------------------\n");
 }

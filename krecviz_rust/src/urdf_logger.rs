@@ -15,9 +15,8 @@ use rerun::{
 use urdf_rs::{self, Geometry, Link, Material, Robot};
 
 use crate::debug_log_utils::{
-    debug_print_link_transform_info,
-    debug_print_mesh_log,
-    debug_print_stl_load,
+    debug_log_rerun_transform,
+    debug_log_rerun_mesh,
 };
 use crate::geometry_utils::{
     apply_4x4_to_mesh3d, compute_vertex_normals, float_rgba_to_u8, load_image_as_rerun_buffer,
@@ -48,8 +47,6 @@ pub fn log_link_meshes_at_identity(
     rec: &RecordingStream,
     _robot: &Robot,
 ) -> Result<()> {
-    let mut doc_text = format!("Link at IDENTITY: {}\n", link.name);
-    
     // Get the entity path from BFS data
     let link_bfs_data = link_bfs_map
         .get(&link.name)
@@ -87,7 +84,6 @@ pub fn log_link_meshes_at_identity(
                         joined
                     }
                 };
-                debug_print_stl_load(&abs_path);
                 let mut info_txt = format!("Mesh file={:?}, scale={:?}\n", abs_path, scale);
                 if abs_path
                     .extension()
@@ -185,8 +181,6 @@ pub fn log_link_meshes_at_identity(
             }
         };
 
-        doc_text.push_str(&format!("Visual #{} => {}\n", i, info_txt));
-
         // Transform the geometry by the local visual.origin:
         let origin = &vis.origin;
         let xyz = [origin.xyz[0], origin.xyz[1], origin.xyz[2]];
@@ -195,15 +189,6 @@ pub fn log_link_meshes_at_identity(
 
         // Bake geometry
         apply_4x4_to_mesh3d(&mut mesh3d, local_tf_4x4);
-
-        // Optionally debug-print link transform
-        debug_print_link_transform_info(
-            link.name.as_str(),
-            &vec![bfs_chain_for_debug_base.clone()],
-            local_tf_4x4,
-            &mesh_entity_path,
-            rpy,
-        );
 
         // optional color
         if let Some(rgba) = mat_info.color_rgba {
@@ -226,15 +211,17 @@ pub fn log_link_meshes_at_identity(
             }
         }
 
-        debug_print_mesh_log(&mesh_entity_path, &mesh3d);
+        debug_log_rerun_mesh(
+            &mesh_entity_path,
+            Some(link_bfs_data),
+            vis.origin.rpy,  // Pass arrays directly
+            vis.origin.xyz,
+            &mesh3d.vertex_positions,
+            "Stage1 geometry logging"
+        );
 
-        // Finally log
         rec.log(mesh_entity_path.as_str(), &mesh3d)?;
     }
-
-    // Log text summaries, useful for debugging
-    // let doc_entity = format!("{}/text_summary", entity_path);
-    // rec.log(doc_entity.as_str(), &TextDocument::new(doc_text))?;
 
     Ok(())
 }
@@ -285,6 +272,16 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
             link_data.local_transform
         );
         let tf = Transform3D::from_translation(translation).with_mat3x3(mat3x3);
+        
+        debug_log_rerun_transform(
+            &link_data.link_only_path,
+            Some(link_data),
+            link_data.local_rpy,
+            translation,
+            mat3x3,
+            "Stage2 BFS apply transform"
+        );
+        
         rec.log(&*link_data.link_only_path, &tf)?;
     }
 
