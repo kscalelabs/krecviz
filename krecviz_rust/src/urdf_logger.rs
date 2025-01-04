@@ -225,7 +225,7 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
         .map_err(|e| anyhow::anyhow!("Failed to parse URDF {urdf_path:?}: {e}"))?;
 
     // Build BFS data once
-    let link_bfs_map = build_link_bfs_map(&robot);
+    let (link_bfs_map, bfs_order) = build_link_bfs_map(&robot);
 
     println!("======================");
     println!("Stage1: log geometry at identity");
@@ -253,11 +253,12 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
         )?;
     }
 
+    // Stage 2: Apply transforms in BFS order
     println!("======================");
     println!("Stage2: BFS apply transforms");
-    
-    // Apply transforms using BFS data
-    for link_data in link_bfs_map.values() {
+
+    for link_name in &bfs_order {
+        let link_data = &link_bfs_map[link_name];
         let (translation, mat3x3) = decompose_4x4_to_translation_and_mat3x3(
             link_data.local_transform
         );
