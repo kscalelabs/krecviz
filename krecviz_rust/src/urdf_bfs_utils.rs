@@ -1,9 +1,12 @@
 use std::collections::{HashMap, HashSet, VecDeque};
 use urdf_rs::{Joint, Link, Robot};
 use anyhow::Result;
+use nalgebra as na;
+use na::{Matrix3, Matrix4};
 
 use crate::spatial_transform_utils::{
-    mat4x4_mul, identity_4x4, build_4x4_from_xyz_rpy, rotation_from_euler_xyz
+    mat4x4_mul, identity_4x4, build_4x4_from_xyz_rpy, rotation_from_euler_xyz,
+    n_mat4x4_mul, n_build_4x4_from_xyz_rpy,
 };
 use crate::debug_log_utils::debug_log_bfs_insertion;
 
@@ -21,21 +24,17 @@ pub struct LinkBfsData {
     /// e.g. "base_link/joint1/child_link/joint2/gripper_link"
     pub link_full_path: String,
     
-    /// The local RPY from the last joint that connects to parent
-    /// For root link, this will be [0.0, 0.0, 0.0]
+    /// The local RPY angles from the joint origin
     pub local_rpy: [f64; 3],
     
-    /// The local translation (XYZ) from the last joint
-    /// For root link, this will be [0.0, 0.0, 0.0]
+    /// The local translation from the joint origin
     pub local_translation: [f64; 3],
     
-    /// The local transform relative to parent (row-major)
-    /// For root link, this will be identity
-    pub local_transform: [f32; 16],
+    /// The local transform matrix (from joint origin)
+    pub local_transform: Matrix4<f32>,
     
-    /// The global (accumulated) transform from root link (row-major)
-    /// For root link, this will be identity
-    pub global_transform: [f32; 16],
+    /// The global transform matrix (accumulated from root)
+    pub global_transform: Matrix4<f32>,
 }
 
 /// Build adjacency map from joints to their child links
@@ -89,8 +88,8 @@ pub fn build_link_bfs_map(robot: &Robot) -> (HashMap<String, LinkBfsData>, Vec<S
         link_full_path: root_link.clone(),
         local_rpy: [0.0, 0.0, 0.0],
         local_translation: [0.0, 0.0, 0.0],
-        local_transform: identity_4x4(),
-        global_transform: identity_4x4(),
+        local_transform: na::Matrix4::identity(),
+        global_transform: na::Matrix4::identity(),
     };
     
     link_bfs_map.insert(root_link.clone(), root_data);
@@ -139,8 +138,9 @@ pub fn build_link_bfs_map(robot: &Robot) -> (HashMap<String, LinkBfsData>, Vec<S
                     joint.origin.rpy[2],
                 ];
 
-                let local_tf_4x4 = build_4x4_from_xyz_rpy(local_xyz, local_rpy);
-                let child_global_tf = mat4x4_mul(parent_final_transform, local_tf_4x4);
+                let local_tf_4x4 = n_build_4x4_from_xyz_rpy(local_xyz, local_rpy);
+                let child_global_tf = n_mat4x4_mul(&parent_final_transform, &local_tf_4x4);
+                
 
                 let child_data = LinkBfsData {
                     link_name: child_link_name.clone(),
@@ -168,7 +168,7 @@ pub fn build_link_bfs_map(robot: &Robot) -> (HashMap<String, LinkBfsData>, Vec<S
 pub struct JointInfo {
     pub entity_path: String,
     pub origin_translation: [f32; 3],
-    pub base_rotation: [f32; 9],
+    pub base_rotation: Matrix3<f32>,
 }
 
 /// Build joint info map using the BFS data
@@ -188,11 +188,11 @@ pub fn build_joint_name_to_joint_info(urdf_path: &str) -> Result<HashMap<String,
                 joint.origin.xyz[2] as f32,
             ];
             
-            let base_rotation = rotation_from_euler_xyz(
+            let base_rotation = na::Matrix3::from_row_slice(&rotation_from_euler_xyz(
                 joint.origin.rpy[0],
                 joint.origin.rpy[1],
                 joint.origin.rpy[2],
-            );
+            ));
             
             let info = JointInfo {
                 entity_path,

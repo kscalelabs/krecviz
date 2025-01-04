@@ -16,6 +16,9 @@ use image;
 // For reading STL geometry
 use stl_io;
 
+use nalgebra as na;
+use na::{Matrix4, Vector4};
+
 /// Compute the cross product of two 3D vectors.
 pub fn cross(a: [f32; 3], b: [f32; 3]) -> [f32; 3] {
     [
@@ -112,6 +115,30 @@ pub fn apply_4x4_to_mesh3d(mesh: &mut Mesh3D, tf: [f32; 16]) {
     }
 }
 
+
+/// Apply a 4×4 transform to every vertex & normal in the mesh.
+pub fn n_apply_4x4_to_mesh3d(mesh: &mut Mesh3D, tf: &Matrix4<f32>) {
+    // Positions
+    for v in &mut mesh.vertex_positions {
+        let point = Vector4::new(v[0], v[1], v[2], 1.0);
+        let transformed = tf * point;
+        v[0] = transformed[0];
+        v[1] = transformed[1];
+        v[2] = transformed[2];
+    }
+    
+    // Normals
+    if let Some(ref mut normals) = mesh.vertex_normals {
+        for n in normals {
+            let normal = Vector4::new(n[0], n[1], n[2], 0.0);
+            let transformed = tf * normal;
+            n[0] = transformed[0];
+            n[1] = transformed[1];
+            n[2] = transformed[2];
+        }
+    }
+}
+
 /// Load an STL file from disk and convert to a `Mesh3D`.
 ///
 /// Currently only handles `.stl`.
@@ -180,4 +207,25 @@ pub fn load_image_as_rerun_buffer(path: &Path) -> Result<ImageBuffer> {
     let rgba = img.to_rgba8().into_raw();
 
     Ok(ImageBuffer(Blob::from(rgba)))
+}
+
+/// Scale each vertex in the Mesh3D by the given [sx, sy, sz].
+pub fn apply_scale_to_mesh3d(mesh: &mut Mesh3D, scale: [f32; 3]) {
+    for v in &mut mesh.vertex_positions {
+        v[0] *= scale[0];
+        v[1] *= scale[1];
+        v[2] *= scale[2];
+    }
+}
+
+/// Scale each vertex in the Mesh3D by the given [sx, sy, sz].
+pub fn n_apply_scale_to_mesh3d(mesh: &mut Mesh3D, scale: [f32; 3]) {
+    let scale_vec = na::Vector3::new(scale[0], scale[1], scale[2]);
+    for v in &mut mesh.vertex_positions {
+        let vertex = na::Vector3::new(v[0], v[1], v[2]);
+        let scaled = vertex.component_mul(&scale_vec);  // Element-wise multiplication
+        v[0] = scaled[0];
+        v[1] = scaled[1];
+        v[2] = scaled[2];
+    }
 }

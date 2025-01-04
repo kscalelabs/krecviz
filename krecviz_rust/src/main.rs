@@ -4,6 +4,8 @@ use env_logger::{Builder, Env};
 use rerun::RecordingStream; // for rec.set_time_sequence(...)
 use std::collections::HashMap;
 use std::f64::consts::PI;
+use nalgebra as na;
+use na::{Matrix3, Matrix4, Vector3, Rotation3, Translation3, Isometry3, UnitQuaternion};
 
 mod debug_log_utils;
 mod geometry_utils;
@@ -19,6 +21,9 @@ use spatial_transform_utils::{
     build_z_rotation_3x3,
     make_4x4_from_rotation_and_translation,
     decompose_4x4_to_translation_and_mat3x3,
+    n_decompose_4x4_to_translation_and_mat3x3,
+    n_build_4x4_from_xyz_rpy,
+    n_build_4x4_from_rowmajor_3x3_and_translation,
     mat3x3_mul
 };
 use urdf_bfs_utils::build_joint_name_to_joint_info;
@@ -163,23 +168,24 @@ fn main() -> Result<()> {
                     if let Some(joint_info) = joint_info_map.get(*joint_name) {
                         if let Some(pos_deg) = state.position {
                             let angle_rad = pos_deg * (PI / 180.0);
-                            
-                            // First build the new rotation (3x3)
-                            let new_rotation = build_z_rotation_3x3(angle_rad);
-                            
-                            // Multiply with base rotation (3x3)
-                            let final_rotation = mat3x3_mul(joint_info.base_rotation, new_rotation);
-                            
-                            // Make 4x4 matrix with rotation and translation
-                            let tf4x4 = make_4x4_from_rotation_and_translation(
-                                final_rotation,
-                                joint_info.origin_translation
-                            );
-                            
-                            // Now decompose (this will handle the row->column major conversion)
-                            let (translation, mat3x3) = decompose_4x4_to_translation_and_mat3x3(tf4x4);
 
-                            // Log the transform
+                            // (1) Build the "base" 4×4 from row-major base_rotation + origin_translation
+                            let base_tf = n_build_4x4_from_rowmajor_3x3_and_translation(
+                                joint_info.base_rotation,          // old row-major 3×3
+                                joint_info.origin_translation,     // [f32; 3]
+                            );
+                    
+                            // (2) Build the incremental Z transform with our row->col fix:
+                            let z_tf = n_build_4x4_from_xyz_rpy(
+                                [0.0, 0.0, 0.0],
+                                [0.0, 0.0, angle_rad as f64],
+                            );
+                    
+                            // (3) Multiply
+                            let final_tf = base_tf * z_tf;
+                    
+                            // (4) Decompose & log
+                            let (translation, mat3x3) = n_decompose_4x4_to_translation_and_mat3x3(&final_tf);
                             let tf = rerun::archetypes::Transform3D::from_translation(translation)
                                 .with_mat3x3(mat3x3);
 

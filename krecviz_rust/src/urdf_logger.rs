@@ -20,10 +20,10 @@ use crate::debug_log_utils::{
 };
 use crate::geometry_utils::{
     apply_4x4_to_mesh3d, compute_vertex_normals, float_rgba_to_u8, load_image_as_rerun_buffer,
-    load_stl_as_mesh3d,
+    load_stl_as_mesh3d, apply_scale_to_mesh3d, n_apply_scale_to_mesh3d, n_apply_4x4_to_mesh3d,
 };
 use crate::spatial_transform_utils::{
-    build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3, mat4x4_mul,
+    build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3, mat4x4_mul, n_decompose_4x4_to_translation_and_mat3x3, n_build_4x4_from_xyz_rpy,
 };
 use crate::urdf_bfs_utils::{build_link_bfs_map, LinkBfsData};
 
@@ -89,14 +89,21 @@ pub fn log_link_meshes_at_identity(
                     == Some("stl")
                 {
                     match load_stl_as_mesh3d(&abs_path) {
-                        Ok(m) => m,
+                        Ok(mut m) => {
+                            // If the URDF specified scale=[sx, sy, sz], apply it:
+                            if let Some(s) = scale {
+                                let scale_f32 = [s[0] as f32, s[1] as f32, s[2] as f32];
+                                n_apply_scale_to_mesh3d(&mut m, scale_f32);
+                            }
+                            m
+                        }
                         Err(e) => {
-                            eprintln!("Error loading STL {abs_path:?}: {e}");
+                            log::error!("Failed to load STL at {:?}: {:?}", abs_path, e);
                             Mesh3D::new(Vec::<[f32; 3]>::new())
                         }
                     }
                 } else {
-                    eprintln!("Currently only .stl files are handled: {abs_path:?}");
+                    log::error!("Currently only .stl files are handled: {:?}", abs_path);
                     Mesh3D::new(Vec::<[f32; 3]>::new())
                 }
             }
@@ -138,11 +145,11 @@ pub fn log_link_meshes_at_identity(
                 let mut mesh = Mesh3D::new(positions).with_triangle_indices(indices);
 
                 // pre-rotate so cylinder axis is +Z
-                let rotate_x_90 = build_4x4_from_xyz_rpy(
+                let rotate_x_90 = n_build_4x4_from_xyz_rpy(
                     [0.0, 0.0, 0.0],
                     [-std::f64::consts::FRAC_PI_2, 0.0, 0.0],
                 );
-                apply_4x4_to_mesh3d(&mut mesh, rotate_x_90);
+                n_apply_4x4_to_mesh3d(&mut mesh, &rotate_x_90);
 
                 // now compute normals
                 compute_vertex_normals(&mut mesh);
@@ -175,10 +182,10 @@ pub fn log_link_meshes_at_identity(
         let origin = &vis.origin;
         let xyz = [origin.xyz[0], origin.xyz[1], origin.xyz[2]];
         let rpy = [origin.rpy[0], origin.rpy[1], origin.rpy[2]];
-        let local_tf_4x4 = build_4x4_from_xyz_rpy(xyz, rpy);
+        let local_tf_4x4 = n_build_4x4_from_xyz_rpy(xyz, rpy);
 
-        // Bake geometry
-        apply_4x4_to_mesh3d(&mut mesh3d, local_tf_4x4);
+        // Bake geometry local transform
+        n_apply_4x4_to_mesh3d(&mut mesh3d, &local_tf_4x4);
 
         // optional color
         if let Some(rgba) = mat_info.color_rgba {
@@ -259,8 +266,8 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
 
     for link_name in &bfs_order {
         let link_data = &link_bfs_map[link_name];
-        let (translation, mat3x3) = decompose_4x4_to_translation_and_mat3x3(
-            link_data.local_transform
+        let (translation, mat3x3) = n_decompose_4x4_to_translation_and_mat3x3(
+            &link_data.local_transform
         );
         let tf = Transform3D::from_translation(translation).with_mat3x3(mat3x3);
         

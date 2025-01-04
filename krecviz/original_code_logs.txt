@@ -1,0 +1,909 @@
+[src/main.rs:132:9] urdf_path = "../tests/assets/urdf_examples/gpr/robot.urdf"
+[2025-01-04T08:44:51Z INFO  re_sdk_comms::server] New SDK client connected from: 127.0.0.1:41222
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'body1-part'
+ Link-only path:  'base/body1-part'
+ Link-full path:  'base/floating_base/body1-part'
+ local RPY: [-1.570, 3.140, 0.000]
+ local XYZ: [0.000, 0.000, 0.000]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'leg0_shell'
+ Link-only path:  'base/body1-part/leg0_shell'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell'
+ local RPY: [-3.142, 0.000, -3.142]
+ local XYZ: [-0.008, -0.432, 0.088]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'leg0_shell_2'
+ Link-only path:  'base/body1-part/leg0_shell_2'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2'
+ local RPY: [0.000, 0.000, -3.142]
+ local XYZ: [-0.008, -0.432, -0.088]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'shoulder'
+ Link-only path:  'base/body1-part/shoulder'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder'
+ local RPY: [3.142, -0.000, 3.142]
+ local XYZ: [-0.000, 0.018, 0.187]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'shoulder_2'
+ Link-only path:  'base/body1-part/shoulder_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2'
+ local RPY: [0.000, 0.000, -3.142]
+ local XYZ: [-0.000, 0.018, -0.188]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'leg1_shell'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell'
+ local RPY: [-1.571, 0.000, 1.571]
+ local XYZ: [0.026, -0.000, -0.070]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'leg1_shell3'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3'
+ local RPY: [1.571, -0.000, -1.571]
+ local XYZ: [0.026, -0.000, -0.070]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'arm1_top'
+ Link-only path:  'base/body1-part/shoulder/arm1_top'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top'
+ local RPY: [1.571, 0.000, 1.571]
+ local XYZ: [0.023, 0.000, -0.067]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'arm1_top_2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2'
+ local RPY: [1.571, -0.000, -1.571]
+ local XYZ: [0.023, -0.000, -0.067]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'leg2_shell'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell/leg2_shell'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell/L_hip_z/leg2_shell'
+ local RPY: [-0.000, 1.571, 0.000]
+ local XYZ: [-0.156, 0.000, 0.027]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'leg2_shell_2'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3/R_hip_z/leg2_shell_2'
+ local RPY: [-3.142, -1.571, 0.000]
+ local XYZ: [-0.156, 0.000, 0.027]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'arm2_shell'
+ Link-only path:  'base/body1-part/shoulder/arm1_top/arm2_shell'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top/Revolute_5/arm2_shell'
+ local RPY: [-1.571, -0.000, -1.571]
+ local XYZ: [-0.139, -0.000, -0.023]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'arm2_shell_2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2/Revolute_6/arm2_shell_2'
+ local RPY: [-3.142, 1.571, 0.000]
+ local XYZ: [-0.139, 0.000, 0.022]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'leg3_shell2'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell/leg2_shell/leg3_shell2'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell/L_hip_z/leg2_shell/L_knee/leg3_shell2'
+ local RPY: [1.571, 0.000, 0.000]
+ local XYZ: [0.000, 0.034, -0.143]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'leg3_shell22'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/leg3_shell22'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3/R_hip_z/leg2_shell_2/R_knee/leg3_shell22'
+ local RPY: [1.571, 0.000, 0.000]
+ local XYZ: [0.000, 0.034, -0.143]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'arm3_shell'
+ Link-only path:  'base/body1-part/shoulder/arm1_top/arm2_shell/arm3_shell'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top/Revolute_5/arm2_shell/Revolute_8/arm3_shell'
+ local RPY: [-3.142, -1.571, 0.000]
+ local XYZ: [-0.026, 0.000, -0.098]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'arm3_shell2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/arm3_shell2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2/Revolute_6/arm2_shell_2/Revolute_7/arm3_shell2'
+ local RPY: [-1.571, 1.571, 0.000]
+ local XYZ: [0.000, -0.026, 0.098]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'foot1'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell/leg2_shell/leg3_shell2/foot1'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell/L_hip_z/leg2_shell/L_knee/leg3_shell2/L_ankle_y/foot1'
+ local RPY: [0.000, 0.000, 0.000]
+ local XYZ: [0.000, -0.300, 0.070]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'foot3'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/leg3_shell22/foot3'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3/R_hip_z/leg2_shell_2/R_knee/leg3_shell22/R_ankle_y/foot3'
+ local RPY: [-3.142, 0.000, -3.142]
+ local XYZ: [0.000, -0.300, 0.027]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'hand_shell'
+ Link-only path:  'base/body1-part/shoulder/arm1_top/arm2_shell/arm3_shell/hand_shell'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top/Revolute_5/arm2_shell/Revolute_8/arm3_shell/Revolute_16/hand_shell'
+ local RPY: [-1.571, -0.000, -1.571]
+ local XYZ: [-0.181, -0.000, 0.022]
+ ---------------------------------------
+    
+ === debug_log_bfs_insertion ===
+ Label: BFS insertion
+ Link name:       'hand_shell_2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/arm3_shell2/hand_shell_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2/Revolute_6/arm2_shell_2/Revolute_7/arm3_shell2/Revolute_15/hand_shell_2'
+ local RPY: [-1.571, -0.000, -1.571]
+ local XYZ: [-0.181, -0.000, 0.022]
+ ---------------------------------------
+    
+======================
+Stage1: log geometry at identity
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/visual_0'
+ Link name:       'body1-part'
+ Link-only path:  'base/body1-part'
+ Link-full path:  'base/floating_base/body1-part'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 39832
+ First 3 vertex positions:
+    [0.008, -0.348, 0.079]
+    [0.004, -0.348, 0.072]
+    [0.004, -0.348, 0.090]
+ Last 3 vertex positions:
+    [-0.022, 0.084, 0.157]
+    [0.008, 0.076, 0.162]
+    [-0.055, 0.018, -0.143]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/shoulder/visual_0'
+ Link name:       'shoulder'
+ Link-only path:  'base/body1-part/shoulder'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 2931
+ First 3 vertex positions:
+    [0.020, -0.046, -0.067]
+    [-0.019, -0.046, -0.067]
+    [-0.019, -0.046, -0.072]
+ Last 3 vertex positions:
+    [0.020, 0.017, -0.003]
+    [-0.014, 0.024, -0.003]
+    [-0.027, -0.002, 0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/shoulder_2/visual_0'
+ Link name:       'shoulder_2'
+ Link-only path:  'base/body1-part/shoulder_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 2927
+ First 3 vertex positions:
+    [0.020, 0.046, -0.059]
+    [-0.019, 0.046, -0.059]
+    [-0.019, 0.045, -0.055]
+ Last 3 vertex positions:
+    [-0.007, -0.026, -0.003]
+    [0.016, -0.023, 0.000]
+    [-0.018, 0.021, 0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/leg0_shell/visual_0'
+ Link name:       'leg0_shell'
+ Link-only path:  'base/body1-part/leg0_shell'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 6177
+ First 3 vertex positions:
+    [-0.042, 0.018, -0.054]
+    [-0.042, 0.019, -0.056]
+    [-0.042, 0.018, -0.057]
+ Last 3 vertex positions:
+    [0.020, -0.001, -0.000]
+    [-0.014, 0.007, -0.004]
+    [0.018, -0.010, -0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/leg0_shell_2/visual_0'
+ Link name:       'leg0_shell_2'
+ Link-only path:  'base/body1-part/leg0_shell_2'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 6177
+ First 3 vertex positions:
+    [-0.042, 0.018, -0.054]
+    [-0.042, 0.019, -0.056]
+    [-0.042, 0.018, -0.057]
+ Last 3 vertex positions:
+    [0.020, -0.001, -0.000]
+    [-0.014, 0.007, -0.004]
+    [0.018, -0.010, -0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/shoulder/arm1_top/visual_0'
+ Link name:       'arm1_top'
+ Link-only path:  'base/body1-part/shoulder/arm1_top'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 5741
+ First 3 vertex positions:
+    [-0.159, 0.033, 0.000]
+    [-0.159, 0.032, 0.001]
+    [-0.159, 0.032, 0.001]
+ Last 3 vertex positions:
+    [0.009, -0.010, 0.010]
+    [0.015, -0.004, 0.010]
+    [0.011, 0.011, 0.002]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/shoulder_2/arm1_top_2/visual_0'
+ Link name:       'arm1_top_2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 5763
+ First 3 vertex positions:
+    [-0.159, 0.032, -0.002]
+    [-0.159, 0.032, -0.002]
+    [-0.159, 0.032, -0.002]
+ Last 3 vertex positions:
+    [0.021, -0.012, -0.011]
+    [0.010, 0.014, -0.003]
+    [-0.009, 0.010, -0.011]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/leg0_shell/leg1_shell/visual_0'
+ Link name:       'leg1_shell'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 5242
+ First 3 vertex positions:
+    [-0.166, 0.049, 0.052]
+    [-0.166, 0.050, 0.051]
+    [-0.182, 0.048, 0.052]
+ Last 3 vertex positions:
+    [-0.027, 0.005, -0.001]
+    [-0.113, 0.043, -0.001]
+    [-0.021, -0.018, -0.001]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/leg0_shell_2/leg1_shell3/visual_0'
+ Link name:       'leg1_shell3'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 5252
+ First 3 vertex positions:
+    [-0.163, -0.048, 0.052]
+    [-0.179, -0.048, 0.052]
+    [-0.179, -0.049, 0.052]
+ Last 3 vertex positions:
+    [0.009, -0.026, 0.000]
+    [-0.027, -0.002, -0.001]
+    [0.004, 0.004, 0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/shoulder/arm1_top/arm2_shell/visual_0'
+ Link name:       'arm2_shell'
+ Link-only path:  'base/body1-part/shoulder/arm1_top/arm2_shell'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top/Revolute_5/arm2_shell'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 2961
+ First 3 vertex positions:
+    [0.011, 0.003, -0.059]
+    [-0.017, 0.000, -0.059]
+    [0.011, 0.000, -0.059]
+ Last 3 vertex positions:
+    [-0.001, 0.014, -0.004]
+    [0.009, -0.008, -0.004]
+    [0.008, 0.003, -0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/visual_0'
+ Link name:       'arm2_shell_2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2/Revolute_6/arm2_shell_2'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 2961
+ First 3 vertex positions:
+    [0.003, 0.011, 0.058]
+    [0.000, -0.018, 0.058]
+    [0.000, 0.011, 0.058]
+ Last 3 vertex positions:
+    [0.014, -0.001, 0.003]
+    [-0.008, 0.009, 0.003]
+    [0.003, 0.008, -0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/leg0_shell/leg1_shell/leg2_shell/visual_0'
+ Link name:       'leg2_shell'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell/leg2_shell'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell/L_hip_z/leg2_shell'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 5234
+ First 3 vertex positions:
+    [-0.019, 0.031, -0.131]
+    [-0.018, 0.031, -0.130]
+    [-0.019, 0.031, -0.129]
+ Last 3 vertex positions:
+    [-0.027, -0.020, -0.050]
+    [0.002, -0.017, -0.003]
+    [-0.000, -0.017, 0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/visual_0'
+ Link name:       'leg2_shell_2'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3/R_hip_z/leg2_shell_2'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 5234
+ First 3 vertex positions:
+    [-0.019, 0.031, -0.131]
+    [-0.018, 0.031, -0.130]
+    [-0.019, 0.031, -0.129]
+ Last 3 vertex positions:
+    [-0.027, -0.020, -0.050]
+    [0.002, -0.017, -0.003]
+    [-0.000, -0.017, 0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/shoulder/arm1_top/arm2_shell/arm3_shell/visual_0'
+ Link name:       'arm3_shell'
+ Link-only path:  'base/body1-part/shoulder/arm1_top/arm2_shell/arm3_shell'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top/Revolute_5/arm2_shell/Revolute_8/arm3_shell'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 2099
+ First 3 vertex positions:
+    [-0.178, 0.003, -0.018]
+    [-0.150, 0.000, -0.018]
+    [-0.178, 0.000, -0.018]
+ Last 3 vertex positions:
+    [-0.005, -0.017, -0.000]
+    [0.006, -0.016, -0.000]
+    [0.005, -0.017, -0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/arm3_shell2/visual_0'
+ Link name:       'arm3_shell2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/arm3_shell2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2/Revolute_6/arm2_shell_2/Revolute_7/arm3_shell2'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 2097
+ First 3 vertex positions:
+    [-0.178, -0.003, -0.018]
+    [-0.150, -0.007, -0.017]
+    [-0.178, -0.007, -0.017]
+ Last 3 vertex positions:
+    [-0.006, 0.016, -0.004]
+    [-0.006, 0.016, -0.000]
+    [-0.017, -0.002, -0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/leg0_shell/leg1_shell/leg2_shell/leg3_shell2/visual_0'
+ Link name:       'leg3_shell2'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell/leg2_shell/leg3_shell2'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell/L_hip_z/leg2_shell/L_knee/leg3_shell2'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 13406
+ First 3 vertex positions:
+    [0.019, -0.234, 0.063]
+    [0.019, -0.234, 0.066]
+    [0.019, -0.234, 0.066]
+ Last 3 vertex positions:
+    [0.022, -0.249, 0.031]
+    [0.002, -0.034, -0.000]
+    [-0.034, -0.003, -0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/leg3_shell22/visual_0'
+ Link name:       'leg3_shell22'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/leg3_shell22'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3/R_hip_z/leg2_shell_2/R_knee/leg3_shell22'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 13375
+ First 3 vertex positions:
+    [-0.018, -0.234, 0.063]
+    [-0.018, -0.234, 0.066]
+    [-0.018, -0.181, 0.063]
+ Last 3 vertex positions:
+    [-0.025, -0.065, 0.018]
+    [0.031, -0.014, -0.000]
+    [0.017, -0.029, -0.000]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/shoulder/arm1_top/arm2_shell/arm3_shell/hand_shell/visual_0'
+ Link name:       'hand_shell'
+ Link-only path:  'base/body1-part/shoulder/arm1_top/arm2_shell/arm3_shell/hand_shell'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top/Revolute_5/arm2_shell/Revolute_8/arm3_shell/Revolute_16/hand_shell'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 4468
+ First 3 vertex positions:
+    [0.034, 0.024, -0.117]
+    [0.035, -0.012, -0.118]
+    [0.035, -0.012, -0.118]
+ Last 3 vertex positions:
+    [-0.012, 0.020, -0.062]
+    [0.022, -0.022, -0.062]
+    [0.028, 0.010, -0.001]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/arm3_shell2/hand_shell_2/visual_0'
+ Link name:       'hand_shell_2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/arm3_shell2/hand_shell_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2/Revolute_6/arm2_shell_2/Revolute_7/arm3_shell2/Revolute_15/hand_shell_2'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 4468
+ First 3 vertex positions:
+    [0.034, 0.024, -0.117]
+    [0.035, -0.012, -0.118]
+    [0.035, -0.012, -0.118]
+ Last 3 vertex positions:
+    [-0.012, 0.020, -0.062]
+    [0.022, -0.022, -0.062]
+    [0.028, 0.010, -0.001]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/leg3_shell22/foot3/visual_0'
+ Link name:       'foot3'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/leg3_shell22/foot3'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3/R_hip_z/leg2_shell_2/R_knee/leg3_shell22/R_ankle_y/foot3'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 6051
+ First 3 vertex positions:
+    [0.032, -0.036, -0.028]
+    [0.032, -0.036, -0.029]
+    [0.033, -0.036, -0.028]
+ Last 3 vertex positions:
+    [0.081, -0.025, -0.026]
+    [0.031, -0.015, -0.048]
+    [0.030, -0.025, -0.047]
+ ======================================
+    
+ === debug_log_rerun_mesh ===
+ Label: Stage1 geometry logging
+ Entity path: 'base/body1-part/leg0_shell/leg1_shell/leg2_shell/leg3_shell2/foot1/visual_0'
+ Link name:       'foot1'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell/leg2_shell/leg3_shell2/foot1'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell/L_hip_z/leg2_shell/L_knee/leg3_shell2/L_ankle_y/foot1'
+ Original RPY: [0.000, 0.000, 0.000]
+ Original XYZ: [0.000, 0.000, 0.000]
+ Number of mesh vertices: 6127
+ First 3 vertex positions:
+    [0.032, -0.036, -0.015]
+    [0.032, -0.036, -0.014]
+    [0.031, -0.036, -0.015]
+ Last 3 vertex positions:
+    [-0.029, -0.015, -0.040]
+    [0.004, -0.021, 0.017]
+    [-0.030, -0.015, -0.001]
+ ======================================
+    
+======================
+Stage2: BFS apply transforms
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base'
+ Link name:       'base'
+ Link-only path:  'base'
+ Link-full path:  'base'
+ Original RPY:    [0.000, 0.000, 0.000]
+ Final translation: [0.000, 0.000, 0.000]
+ Rotation Matrix (3x3):
+   [   1.000,    0.000,    0.000]
+   [   0.000,    1.000,    0.000]
+   [   0.000,    0.000,    1.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part'
+ Link name:       'body1-part'
+ Link-only path:  'base/body1-part'
+ Link-full path:  'base/floating_base/body1-part'
+ Original RPY:    [-1.570, 3.140, 0.000]
+ Final translation: [0.000, 0.000, 0.000]
+ Rotation Matrix (3x3):
+   [  -1.000,    0.000,   -0.002]
+   [  -0.002,    0.001,    1.000]
+   [   0.000,    1.000,   -0.001]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/leg0_shell'
+ Link name:       'leg0_shell'
+ Link-only path:  'base/body1-part/leg0_shell'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell'
+ Original RPY:    [-3.142, 0.000, -3.142]
+ Final translation: [-0.008, -0.432, 0.088]
+ Rotation Matrix (3x3):
+   [  -1.000,   -0.000,   -0.000]
+   [   0.000,    1.000,   -0.000]
+   [   0.000,   -0.000,   -1.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/leg0_shell_2'
+ Link name:       'leg0_shell_2'
+ Link-only path:  'base/body1-part/leg0_shell_2'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2'
+ Original RPY:    [0.000, 0.000, -3.142]
+ Final translation: [-0.008, -0.432, -0.088]
+ Rotation Matrix (3x3):
+   [  -1.000,   -0.000,   -0.000]
+   [  -0.000,   -1.000,    0.000]
+   [  -0.000,    0.000,    1.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/shoulder'
+ Link name:       'shoulder'
+ Link-only path:  'base/body1-part/shoulder'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder'
+ Original RPY:    [3.142, -0.000, 3.142]
+ Final translation: [-0.000, 0.018, 0.187]
+ Rotation Matrix (3x3):
+   [  -1.000,    0.000,    0.000]
+   [   0.000,    1.000,    0.000]
+   [  -0.000,    0.000,   -1.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/shoulder_2'
+ Link name:       'shoulder_2'
+ Link-only path:  'base/body1-part/shoulder_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2'
+ Original RPY:    [0.000, 0.000, -3.142]
+ Final translation: [-0.000, 0.018, -0.188]
+ Rotation Matrix (3x3):
+   [  -1.000,   -0.000,    0.000]
+   [   0.000,   -1.000,    0.000]
+   [   0.000,    0.000,    1.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/leg0_shell/leg1_shell'
+ Link name:       'leg1_shell'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell'
+ Original RPY:    [-1.571, 0.000, 1.571]
+ Final translation: [0.026, -0.000, -0.069]
+ Rotation Matrix (3x3):
+   [   0.000,    1.000,    0.000]
+   [  -0.000,    0.000,   -1.000]
+   [  -1.000,    0.000,    0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/leg0_shell_2/leg1_shell3'
+ Link name:       'leg1_shell3'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3'
+ Original RPY:    [1.571, -0.000, -1.571]
+ Final translation: [0.026, -0.000, -0.069]
+ Rotation Matrix (3x3):
+   [  -0.000,   -1.000,    0.000]
+   [   0.000,    0.000,    1.000]
+   [  -1.000,    0.000,    0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/shoulder/arm1_top'
+ Link name:       'arm1_top'
+ Link-only path:  'base/body1-part/shoulder/arm1_top'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top'
+ Original RPY:    [1.571, 0.000, 1.571]
+ Final translation: [0.023, 0.000, -0.068]
+ Rotation Matrix (3x3):
+   [   0.000,    1.000,    0.000]
+   [  -0.000,    0.000,    1.000]
+   [   1.000,   -0.000,    0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/shoulder_2/arm1_top_2'
+ Link name:       'arm1_top_2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2'
+ Original RPY:    [1.571, -0.000, -1.571]
+ Final translation: [0.023, -0.000, -0.068]
+ Rotation Matrix (3x3):
+   [   0.000,   -1.000,    0.000]
+   [  -0.000,   -0.000,    1.000]
+   [  -1.000,   -0.000,   -0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/leg0_shell/leg1_shell/leg2_shell'
+ Link name:       'leg2_shell'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell/leg2_shell'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell/L_hip_z/leg2_shell'
+ Original RPY:    [-0.000, 1.571, 0.000]
+ Final translation: [-0.156, 0.000, 0.027]
+ Rotation Matrix (3x3):
+   [   0.000,    0.000,   -1.000]
+   [   0.000,    1.000,    0.000]
+   [   1.000,    0.000,    0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2'
+ Link name:       'leg2_shell_2'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3/R_hip_z/leg2_shell_2'
+ Original RPY:    [-3.142, -1.571, 0.000]
+ Final translation: [-0.156, 0.000, 0.027]
+ Rotation Matrix (3x3):
+   [   0.000,    0.000,    1.000]
+   [   0.000,   -1.000,   -0.000]
+   [   1.000,    0.000,   -0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/shoulder/arm1_top/arm2_shell'
+ Link name:       'arm2_shell'
+ Link-only path:  'base/body1-part/shoulder/arm1_top/arm2_shell'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top/Revolute_5/arm2_shell'
+ Original RPY:    [-1.571, -0.000, -1.571]
+ Final translation: [-0.140, -0.000, -0.023]
+ Rotation Matrix (3x3):
+   [   0.000,   -1.000,    0.000]
+   [  -0.000,   -0.000,   -1.000]
+   [   1.000,    0.000,   -0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2'
+ Link name:       'arm2_shell_2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2/Revolute_6/arm2_shell_2'
+ Original RPY:    [-3.142, 1.571, 0.000]
+ Final translation: [-0.140, 0.000, 0.022]
+ Rotation Matrix (3x3):
+   [   0.000,    0.000,   -1.000]
+   [  -0.000,   -1.000,   -0.000]
+   [  -1.000,    0.000,   -0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/leg0_shell/leg1_shell/leg2_shell/leg3_shell2'
+ Link name:       'leg3_shell2'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell/leg2_shell/leg3_shell2'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell/L_hip_z/leg2_shell/L_knee/leg3_shell2'
+ Original RPY:    [1.571, 0.000, 0.000]
+ Final translation: [0.000, 0.034, -0.142]
+ Rotation Matrix (3x3):
+   [   1.000,    0.000,    0.000]
+   [   0.000,    0.000,    1.000]
+   [   0.000,   -1.000,    0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/leg3_shell22'
+ Link name:       'leg3_shell22'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/leg3_shell22'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3/R_hip_z/leg2_shell_2/R_knee/leg3_shell22'
+ Original RPY:    [1.571, 0.000, 0.000]
+ Final translation: [0.000, 0.034, -0.142]
+ Rotation Matrix (3x3):
+   [   1.000,    0.000,    0.000]
+   [   0.000,    0.000,    1.000]
+   [   0.000,   -1.000,    0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/shoulder/arm1_top/arm2_shell/arm3_shell'
+ Link name:       'arm3_shell'
+ Link-only path:  'base/body1-part/shoulder/arm1_top/arm2_shell/arm3_shell'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top/Revolute_5/arm2_shell/Revolute_8/arm3_shell'
+ Original RPY:    [-3.142, -1.571, 0.000]
+ Final translation: [-0.026, 0.000, -0.098]
+ Rotation Matrix (3x3):
+   [   0.000,    0.000,    1.000]
+   [   0.000,   -1.000,   -0.000]
+   [   1.000,    0.000,   -0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/arm3_shell2'
+ Link name:       'arm3_shell2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/arm3_shell2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2/Revolute_6/arm2_shell_2/Revolute_7/arm3_shell2'
+ Original RPY:    [-1.571, 1.571, 0.000]
+ Final translation: [0.000, -0.026, 0.097]
+ Rotation Matrix (3x3):
+   [   0.000,    0.000,   -1.000]
+   [  -1.000,    0.000,   -0.000]
+   [   0.000,    1.000,    0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/leg0_shell/leg1_shell/leg2_shell/leg3_shell2/foot1'
+ Link name:       'foot1'
+ Link-only path:  'base/body1-part/leg0_shell/leg1_shell/leg2_shell/leg3_shell2/foot1'
+ Link-full path:  'base/floating_base/body1-part/L_hip_y/leg0_shell/L_hip_x/leg1_shell/L_hip_z/leg2_shell/L_knee/leg3_shell2/L_ankle_y/foot1'
+ Original RPY:    [0.000, 0.000, 0.000]
+ Final translation: [0.000, -0.300, 0.070]
+ Rotation Matrix (3x3):
+   [   1.000,    0.000,    0.000]
+   [   0.000,    1.000,    0.000]
+   [   0.000,   -0.000,    1.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/leg3_shell22/foot3'
+ Link name:       'foot3'
+ Link-only path:  'base/body1-part/leg0_shell_2/leg1_shell3/leg2_shell_2/leg3_shell22/foot3'
+ Link-full path:  'base/floating_base/body1-part/R_hip_y/leg0_shell_2/R_hip_x/leg1_shell3/R_hip_z/leg2_shell_2/R_knee/leg3_shell22/R_ankle_y/foot3'
+ Original RPY:    [-3.142, 0.000, -3.142]
+ Final translation: [0.000, -0.300, 0.027]
+ Rotation Matrix (3x3):
+   [  -1.000,   -0.000,   -0.000]
+   [  -0.000,    1.000,   -0.000]
+   [   0.000,   -0.000,   -1.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/shoulder/arm1_top/arm2_shell/arm3_shell/hand_shell'
+ Link name:       'hand_shell'
+ Link-only path:  'base/body1-part/shoulder/arm1_top/arm2_shell/arm3_shell/hand_shell'
+ Link-full path:  'base/floating_base/body1-part/Revolute_2/shoulder/Revolute_4/arm1_top/Revolute_5/arm2_shell/Revolute_8/arm3_shell/Revolute_16/hand_shell'
+ Original RPY:    [-1.571, -0.000, -1.571]
+ Final translation: [-0.182, -0.000, 0.022]
+ Rotation Matrix (3x3):
+   [   0.000,   -1.000,    0.000]
+   [  -0.000,   -0.000,   -1.000]
+   [   1.000,    0.000,   -0.000]
+ ======================================
+    
+ === debug_log_rerun_transform ===
+ Label: Stage2 BFS apply transform
+ Entity path: 'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/arm3_shell2/hand_shell_2'
+ Link name:       'hand_shell_2'
+ Link-only path:  'base/body1-part/shoulder_2/arm1_top_2/arm2_shell_2/arm3_shell2/hand_shell_2'
+ Link-full path:  'base/floating_base/body1-part/Revolute_1/shoulder_2/Revolute_3/arm1_top_2/Revolute_6/arm2_shell_2/Revolute_7/arm3_shell2/Revolute_15/hand_shell_2'
+ Original RPY:    [-1.571, -0.000, -1.571]
+ Final translation: [-0.182, -0.000, 0.022]
+ Rotation Matrix (3x3):
+   [   0.000,   -1.000,    0.000]
+   [  -0.000,   -0.000,   -1.000]
+   [   1.000,    0.000,   -0.000]
+ ======================================
+    
+[src/main.rs:211:9] "No KREC path provided, so no frame-by-frame animation is logged." = "No KREC path provided, so no frame-by-frame animation is logged."
+
+--- Entering interactive transform REPL ---
+Type an empty path to exit.
+
+Apply transform to path (or empty to quit): 
+Exiting REPL...
