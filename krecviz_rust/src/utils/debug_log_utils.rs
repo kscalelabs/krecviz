@@ -1,4 +1,4 @@
-use crate::urdf_bfs_utils::LinkBfsData;
+use crate::utils::urdf_bfs_utils::LinkBfsData;
 use log::debug;
 use rerun::components::Position3D;
 use urdf_rs::Vec3;

@@ -3,29 +3,34 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
-use image;
+use log::debug;
 use nalgebra as na;
 use parry3d::shape::{Ball as ParrySphere, Cuboid as ParryCuboid, Cylinder as ParryCylinder};
 use rerun::{
-    archetypes::{Mesh3D, Transform3D},
+    archetypes::{Mesh3D, Transform3D, ViewCoordinates},
     components::{Position3D, TriangleIndices},
     datatypes::ImageFormat,
-    RecordingStream, ViewCoordinates,
+    RecordingStream,
 };
 use urdf_rs::{self, Geometry, Link, Material, Robot};
 
-use crate::debug_log_utils::{
+use crate::utils::debug_log_utils::{
     debug_log_rerun_transform,
     debug_log_rerun_mesh,
+    debug_log_bfs_insertion,
 };
-use crate::geometry_utils::{
-    apply_4x4_to_mesh3d, compute_vertex_normals, float_rgba_to_u8, load_image_as_rerun_buffer,
+use crate::utils::geometry_utils::{
+    apply_4x4_to_mesh3d,
+    compute_vertex_normals,
+    float_rgba_to_u8,
+    load_image_as_rerun_buffer,
     load_stl_as_mesh3d,
 };
-use crate::spatial_transform_utils::{
-    build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3, mat4x4_mul,
+use crate::utils::spatial_transform_utils::{
+    build_4x4_from_xyz_rpy,
+    decompose_4x4_to_translation_and_mat3x3,
 };
-use crate::urdf_bfs_utils::{build_link_bfs_map, LinkBfsData};
+use crate::utils::urdf_bfs_utils::{build_link_bfs_map, LinkBfsData};
 
 // -----------------------------------------------------------------------------
 // Minimal info (color & texture path) from a URDF Material.
@@ -219,6 +224,7 @@ pub fn log_link_meshes_at_identity(
 // ----------------------------------------------------------------------------
 // Exported function for main.rs usage
 pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> Result<()> {
+    // Set the coordinate system to right-handed with Z up
     rec.log("", &ViewCoordinates::RIGHT_HAND_Z_UP)?;
 
     let robot = urdf_rs::read_file(urdf_path)

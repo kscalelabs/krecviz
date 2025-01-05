@@ -1,11 +1,16 @@
+use anyhow::Result;
+use log::debug;
 use std::collections::{HashMap, HashSet, VecDeque};
 use urdf_rs::{Joint, Link, Robot};
-use anyhow::Result;
 
-use crate::spatial_transform_utils::{
-    mat4x4_mul, identity_4x4, build_4x4_from_xyz_rpy, rotation_from_euler_xyz
+use crate::utils::spatial_transform_utils::{
+    build_4x4_from_xyz_rpy,
+    decompose_4x4_to_translation_and_mat3x3,
+    mat4x4_mul,
+    identity_4x4,
+    rotation_from_euler_xyz
 };
-use crate::debug_log_utils::debug_log_bfs_insertion;
+use crate::utils::debug_log_utils::debug_log_bfs_insertion;
 
 /// Complete information about a link's position in the hierarchy and transforms
 #[derive(Debug, Clone)]
