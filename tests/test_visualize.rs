@@ -2,11 +2,11 @@ use anyhow::Result;
 use env_logger;
 
 // Import the necessary functions from your crate
-use krecviz_rust::parse_and_log_urdf_hierarchy;
+use krecviz::parse_and_log_urdf_hierarchy;
 
 const BASE_PATH: &str = env!("CARGO_MANIFEST_DIR");
-const URDF_BASE_PATH: &str = "../tests/assets/urdf_examples";
-const KREC_BASE_PATH: &str = "../tests/assets/krec_examples";
+const URDF_BASE_PATH: &str = "tests/assets/urdf_examples";
+const KREC_BASE_PATH: &str = "tests/assets/krec_examples";
 
 fn get_krec_path(key: &str) -> String {
     match key {

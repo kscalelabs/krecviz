@@ -36,7 +36,6 @@ Instructions [here](https://rerun.io/docs/getting-started/installing-viewer#inst
 
 ```bash
 # cd to the repo root
-cd krecviz_rust
 cargo build
 ```
 
@@ -72,35 +71,34 @@ krecviz.viz(
 
 ### Rust
 
-You can either run krecviz_rust as a standalone CLI or call its functionality directly as a library.
+You can either run krecviz as a standalone CLI or call its functionality directly as a library.
 
 #### 1) CLI usage (via cargo run)
 ```bash
 # cd to the repo root
-cd krecviz_rust
 cargo run -- \
-    --urdf ../tests/assets/urdf_examples/gpr/robot.urdf \
-    --krec ../tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
+    --urdf tests/assets/urdf_examples/gpr/robot.urdf \
+    --krec tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
 
 # run in debug mode 
-RUST_LOG=krecviz_rust=debug cargo run -- \
-    --urdf ../tests/assets/urdf_examples/gpr/robot.urdf \
-    --krec ../tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
+RUST_LOG=krecviz=debug cargo run -- \
+    --urdf tests/assets/urdf_examples/gpr/robot.urdf \
+    --krec tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
 ```
 
 #### 2) Using the library from another Rust project
-We haven't published the krecviz_rust crate yet, so you need to add it as a dependency in your Cargo.toml:
+We haven't published the krecviz crate yet, so you need to add it as a dependency in your Cargo.toml:
 
 ```toml
 [dependencies]
-krecviz_rust = { path = "../krecviz_rust" }
+krecviz = { path = "../krecviz" }
 ```
 
 Then simply call `viz`:
 
 ```rust
 use anyhow::Result;
-use krecviz_rust::viz;
+use krecviz::viz;
 
 fn main() -> Result<()> {
     viz(
@@ -150,11 +148,10 @@ These tests will show incorrect rotations, despite having the same logic as the 
 
 ```bash
 # cd to the repo root
-cd krecviz_rust
 # uncomment the test you want to run
 cargo test
 # to get the logs as well, do 
-RUST_LOG=krecviz_rust=debug cargo test -- --nocapture
+RUST_LOG=krecviz=debug cargo test -- --nocapture
 ```
 
 #### Manual URDF
@@ -167,5 +164,5 @@ cd krecviz_rust
 # uncomment the manual_urdf test
 cargo test
 # to get the logs as well, do 
-RUST_LOG=krecviz_rust=debug cargo test -- --nocapture
+RUST_LOG=krecviz=debug cargo test -- --nocapture
 ```
