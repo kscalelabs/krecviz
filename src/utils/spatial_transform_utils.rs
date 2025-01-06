@@ -5,9 +5,8 @@ pub fn mat3x3_mul(a: [f32; 9], b: [f32; 9]) -> [f32; 9] {
     let mut out = [0.0; 9];
     for row in 0..3 {
         for col in 0..3 {
-            out[row * 3 + col] = a[row * 3 + 0] * b[col + 0]
-                + a[row * 3 + 1] * b[col + 3]
-                + a[row * 3 + 2] * b[col + 6];
+            out[row * 3 + col] =
+                a[row * 3] * b[col] + a[row * 3 + 1] * b[col + 3] + a[row * 3 + 2] * b[col + 6];
         }
     }
     out
