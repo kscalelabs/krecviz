@@ -1,6 +1,6 @@
 # Cargo.toml
 [package]
-name = "krecviz_rust"
+name = "krecviz"
 version = "0.1.0"
 edition = "2021"
 
@@ -19,9 +19,9 @@ env_logger = "0.11.6"
 tempfile = "3.14.0"
 
 [lib]
-name = "krecviz_rust"
+name = "krecviz"
 path = "src/lib.rs"
 
 [[bin]]
-name = "krecviz_rust"
+name = "krecviz"
 path = "src/main.rs"

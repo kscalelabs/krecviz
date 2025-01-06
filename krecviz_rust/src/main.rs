@@ -5,7 +5,7 @@ use clap::Parser;
 use env_logger::{Builder, Env};
 
 // Import your crate (assuming crate name is `krecviz_rust`)
-use krecviz_rust::viz;
+use krecviz::viz;
 
 #[derive(Parser, Debug)]
 #[command(name = "rust_krecviz")]
