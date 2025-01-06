@@ -26,7 +26,11 @@ cd /tmp
 wget https://github.com/protocolbuffers/protobuf/releases/download/v28.3/protoc-28.3-linux-x86_64.zip
 unzip protoc-28.3-linux-x86_64.zip
 sudo cp bin/protoc /usr/local/bin/protoc
-``` 
+```
+
+#### Install the Rerun Viewer
+
+Instructions [here](https://rerun.io/docs/getting-started/installing-viewer#installing-the-viewer).
 
 #### Build the krecviz Rust library
 
@@ -68,6 +72,9 @@ krecviz.viz(
 
 ### Rust
 
+You can either run krecviz_rust as a standalone CLI or call its functionality directly as a library.
+
+#### 1) CLI usage (via cargo run)
 ```bash
 # cd to the repo root
 cd krecviz_rust
@@ -75,12 +82,38 @@ cargo run -- \
     --urdf ../tests/assets/urdf_examples/gpr/robot.urdf \
     --krec ../tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
 
-
 # run in debug mode 
-RUST_LOG=krecviz_rust=debug  cargo run --    \
+RUST_LOG=krecviz_rust=debug cargo run -- \
     --urdf ../tests/assets/urdf_examples/gpr/robot.urdf \
     --krec ../tests/assets/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec
 ```
+
+#### 2) Using the library from another Rust project
+We haven't published the krecviz_rust crate yet, so you need to add it as a dependency in your Cargo.toml:
+
+```toml
+[dependencies]
+krecviz_rust = { path = "../krecviz_rust" }
+```
+
+Then simply call `viz`:
+
+```rust
+use anyhow::Result;
+use krecviz_rust::viz;
+
+fn main() -> Result<()> {
+    viz(
+        Some("path/to/robot.urdf"),
+        Some("path/to/robot.krec"),
+        Some("path/to/output.rrd"), // optional
+    )?;
+
+    Ok(())
+}
+```
+
+You can leave any of the arguments as `None` if you don't have them (e.g., no .rrd output).
 
 ## Tests
 
