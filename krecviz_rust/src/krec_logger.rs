@@ -1,17 +1,15 @@
 // krec_logger.rs
 
+use anyhow::Result;
+use krec::KRec;
+use rerun::RecordingStream;
 use std::collections::HashMap;
 use std::f64::consts::PI;
-use anyhow::Result;
-use rerun::RecordingStream;
-use krec::KRec;
 
-use crate::utils::debug_log_utils::{debug_log_rerun_transform, debug_log_actuator_state};
+use crate::utils::debug_log_utils::{debug_log_actuator_state, debug_log_rerun_transform};
 use crate::utils::spatial_transform_utils::{
-    build_z_rotation_3x3,
-    make_4x4_from_rotation_and_translation,
-    mat3x3_mul,
-    decompose_4x4_to_translation_and_mat3x3,
+    build_z_rotation_3x3, decompose_4x4_to_translation_and_mat3x3,
+    make_4x4_from_rotation_and_translation, mat3x3_mul,
 };
 use crate::utils::urdf_bfs_utils::build_joint_name_to_joint_info;
 
@@ -87,7 +85,11 @@ fn log_actuator_states(
 }
 
 /// Parse and log a KREC file, optionally using URDF joint information for transforms
-pub fn parse_and_log_krec(krec: &KRec, urdf_path: Option<&str>, rec: &RecordingStream) -> Result<()> {
+pub fn parse_and_log_krec(
+    krec: &KRec,
+    urdf_path: Option<&str>,
+    rec: &RecordingStream,
+) -> Result<()> {
     // We'll replicate the python actuator->joint map
     let actuator_map = build_actuator_to_urdf_joint_map();
 
@@ -101,28 +103,28 @@ pub fn parse_and_log_krec(krec: &KRec, urdf_path: Option<&str>, rec: &RecordingS
     for (frame_idx, frame) in krec.frames.iter().enumerate() {
         // Set Rerun time-sequence so transforms appear "animated"
         rec.set_time_sequence("frame_idx", frame_idx as i64);
-    
+
         for state in &frame.actuator_states {
             let actuator_id = state.actuator_id;
-    
+
             // 1) Early-exit from "missing" joint_name
             let Some(joint_name) = actuator_map.get(&actuator_id) else {
                 // If this actuator_id isn't in our map, skip it
                 continue;
             };
-    
+
             // 2) Early-exit from "missing" joint_info
             let Some(joint_info) = joint_info_map.get(*joint_name) else {
                 // If we don't know how to handle this joint, skip it
                 continue;
             };
-    
+
             // 3) Early-exit from missing position
             let Some(pos_deg) = state.position else {
                 // No position -> skip
                 continue;
             };
-    
+
             // Now do the transform logic
             let angle_rad = pos_deg * (PI / 180.0);
             let new_rotation = build_z_rotation_3x3(angle_rad);
@@ -134,23 +136,30 @@ pub fn parse_and_log_krec(krec: &KRec, urdf_path: Option<&str>, rec: &RecordingS
 
             // now log the transform
             let (translation, mat3x3) = decompose_4x4_to_translation_and_mat3x3(tf4x4);
-            let tf = rerun::archetypes::Transform3D::from_translation(translation)
-                .with_mat3x3(mat3x3);
-    
+            let tf =
+                rerun::archetypes::Transform3D::from_translation(translation).with_mat3x3(mat3x3);
+
             debug_log_rerun_transform(
                 &joint_info.entity_path,
-                None, 
-                [0.0, 0.0, angle_rad],  
+                None,
+                [0.0, 0.0, angle_rad],
                 translation,
                 mat3x3,
-                "Actuator animation transform"
+                "Actuator animation transform",
             );
             rec.log(&*joint_info.entity_path, &tf)?;
-    
+
             // Optionally log basic actuator states
-            log_actuator_states(rec, frame_idx, actuator_id, state.position, state.velocity, state.torque)?;
+            log_actuator_states(
+                rec,
+                frame_idx,
+                actuator_id,
+                state.position,
+                state.velocity,
+                state.torque,
+            )?;
         }
     }
 
     Ok(())
-} 
+}

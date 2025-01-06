@@ -12,23 +12,14 @@ use rerun::{
 use urdf_rs::{self, Geometry, Link, Material, Robot};
 
 use crate::utils::debug_log_utils::{
-    debug_log_rerun_transform,
-    debug_log_rerun_mesh,
-    debug_log_bfs_insertion,
+    debug_log_bfs_insertion, debug_log_rerun_mesh, debug_log_rerun_transform,
 };
 use crate::utils::geometry_utils::{
-    apply_4x4_to_mesh3d,
-    compute_vertex_normals,
-    float_rgba_to_u8,
-    load_image_as_rerun_buffer,
-    load_stl_as_mesh3d,
-    create_box_mesh,
-    create_cylinder_mesh,
-    create_sphere_mesh,
+    apply_4x4_to_mesh3d, compute_vertex_normals, create_box_mesh, create_cylinder_mesh,
+    create_sphere_mesh, float_rgba_to_u8, load_image_as_rerun_buffer, load_stl_as_mesh3d,
 };
 use crate::utils::spatial_transform_utils::{
-    build_4x4_from_xyz_rpy,
-    decompose_4x4_to_translation_and_mat3x3,
+    build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3,
 };
 use crate::utils::urdf_bfs_utils::{build_link_bfs_map, LinkBfsData};
 
@@ -56,7 +47,7 @@ pub fn log_link_meshes_at_identity(
     let link_bfs_data = link_bfs_map
         .get(&link.name)
         .unwrap_or_else(|| panic!("No BFS data for link '{}'", link.name));
-    
+
     let entity_path = link_bfs_data.link_only_path.clone();
     let bfs_chain_for_debug_base = link_bfs_data.link_full_path.clone();
 
@@ -85,7 +76,7 @@ pub fn log_link_meshes_at_identity(
                     Ok(resolved) => resolved,
                     Err(_) => joined, // If canonicalize fails, use joined as fallback
                 };
-                
+
                 if abs_path
                     .extension()
                     .and_then(|e| e.to_str())
@@ -147,10 +138,10 @@ pub fn log_link_meshes_at_identity(
         debug_log_rerun_mesh(
             &mesh_entity_path,
             Some(link_bfs_data),
-            vis.origin.rpy,  // Pass arrays directly
+            vis.origin.rpy, // Pass arrays directly
             vis.origin.xyz,
             &mesh3d.vertex_positions,
-            "Stage1 geometry logging"
+            "Stage1 geometry logging",
         );
 
         rec.log(mesh_entity_path.as_str(), &mesh3d)?;
@@ -173,7 +164,7 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
 
     println!("======================");
     println!("Stage1: log geometry at identity");
-    
+
     let urdf_dir = Path::new(urdf_path)
         .parent()
         .map(PathBuf::from)
@@ -187,14 +178,7 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
 
     // Log geometry for each link
     for link in &robot.links {
-        log_link_meshes_at_identity(
-            link,
-            &link_bfs_map,
-            &urdf_dir,
-            &mat_map,
-            rec,
-            &robot,
-        )?;
+        log_link_meshes_at_identity(link, &link_bfs_map, &urdf_dir, &mat_map, rec, &robot)?;
     }
 
     // Stage 2: Apply transforms in BFS order
@@ -203,20 +187,19 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
 
     for link_name in &bfs_order {
         let link_data = &link_bfs_map[link_name];
-        let (translation, mat3x3) = decompose_4x4_to_translation_and_mat3x3(
-            link_data.local_transform
-        );
+        let (translation, mat3x3) =
+            decompose_4x4_to_translation_and_mat3x3(link_data.local_transform);
         let tf = Transform3D::from_translation(translation).with_mat3x3(mat3x3);
-        
+
         debug_log_rerun_transform(
             &link_data.link_only_path,
             Some(link_data),
             link_data.local_rpy,
             translation,
             mat3x3,
-            "Stage2 BFS apply transform"
+            "Stage2 BFS apply transform",
         );
-        
+
         rec.log(&*link_data.link_only_path, &tf)?;
     }
 

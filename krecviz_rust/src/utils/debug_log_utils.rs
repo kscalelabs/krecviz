@@ -35,15 +35,13 @@ pub fn debug_log_bfs_insertion(child_data: &LinkBfsData) {
     debug_common_header(
         "debug_log_bfs_insertion",
         "BFS insertion",
-        None,                 // no entity_path
+        None, // no entity_path
         Some(child_data),
     );
 
     debug!(
         "local RPY: [{:.3}, {:.3}, {:.3}]",
-        child_data.local_rpy[0],
-        child_data.local_rpy[1],
-        child_data.local_rpy[2]
+        child_data.local_rpy[0], child_data.local_rpy[1], child_data.local_rpy[2]
     );
     debug!(
         "local XYZ: [{:.3}, {:.3}, {:.3}]",
@@ -56,12 +54,12 @@ pub fn debug_log_bfs_insertion(child_data: &LinkBfsData) {
 
 /// Print debug information about a Transform3D before logging it to Rerun
 pub fn debug_log_rerun_transform(
-    entity_path: &str, 
-    link_data: Option<&LinkBfsData>, 
+    entity_path: &str,
+    link_data: Option<&LinkBfsData>,
     original_rpy: [f64; 3],
     translation: [f32; 3],
     mat3x3: [f32; 9],
-    label: &str
+    label: &str,
 ) {
     // We do have an entity_path here, so we pass Some(entity_path).
     debug_common_header(
@@ -103,12 +101,7 @@ pub fn debug_log_rerun_mesh(
     label: &str,
 ) {
     // Same approach: we do have an entity path, so Some(entity_path).
-    debug_common_header(
-        "debug_log_rerun_mesh",
-        label,
-        Some(entity_path),
-        link_data,
-    );
+    debug_common_header("debug_log_rerun_mesh", label, Some(entity_path), link_data);
 
     debug!(
         "Original RPY: [{:.3}, {:.3}, {:.3}]",

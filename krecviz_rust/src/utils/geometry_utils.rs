@@ -1,6 +1,8 @@
 // geometry_utils.rs
 
 use anyhow::Result;
+use nalgebra as na;
+use parry3d::shape::{Ball as ParrySphere, Cuboid as ParryCuboid, Cylinder as ParryCylinder};
 use rerun::{
     archetypes::Mesh3D,
     components::{ImageBuffer, Position3D, TriangleIndices, Vector3D},
@@ -9,8 +11,6 @@ use rerun::{
 use std::fs::OpenOptions;
 use std::io::BufReader;
 use std::path::Path;
-use nalgebra as na;
-use parry3d::shape::{Ball as ParrySphere, Cuboid as ParryCuboid, Cylinder as ParryCylinder};
 
 // For loading image files
 use image;
@@ -227,10 +227,8 @@ pub fn create_cylinder_mesh(radius: f64, length: f64) -> Mesh3D {
     let mut mesh = Mesh3D::new(positions).with_triangle_indices(indices);
 
     // pre-rotate so cylinder axis is +Z
-    let rotate_x_90 = build_4x4_from_xyz_rpy(
-        [0.0, 0.0, 0.0],
-        [-std::f64::consts::FRAC_PI_2, 0.0, 0.0],
-    );
+    let rotate_x_90 =
+        build_4x4_from_xyz_rpy([0.0, 0.0, 0.0], [-std::f64::consts::FRAC_PI_2, 0.0, 0.0]);
     apply_4x4_to_mesh3d(&mut mesh, rotate_x_90);
 
     // now compute normals

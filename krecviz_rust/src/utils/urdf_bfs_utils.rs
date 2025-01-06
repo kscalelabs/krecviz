@@ -3,41 +3,38 @@ use log::debug;
 use std::collections::{HashMap, HashSet, VecDeque};
 use urdf_rs::{Joint, Link, Robot};
 
-use crate::utils::spatial_transform_utils::{
-    build_4x4_from_xyz_rpy,
-    decompose_4x4_to_translation_and_mat3x3,
-    mat4x4_mul,
-    identity_4x4,
-    rotation_from_euler_xyz
-};
 use crate::utils::debug_log_utils::debug_log_bfs_insertion;
+use crate::utils::spatial_transform_utils::{
+    build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3, identity_4x4, mat4x4_mul,
+    rotation_from_euler_xyz,
+};
 
 /// Complete information about a link's position in the hierarchy and transforms
 #[derive(Debug, Clone)]
 pub struct LinkBfsData {
     /// The name of this link (same as the map key)
     pub link_name: String,
-    
+
     /// A slash-separated path *of links only*, ignoring joints
     /// e.g. "base_link/child_link/gripper_link"
     pub link_only_path: String,
-    
+
     /// A slash-separated path *including* joints for debugging
     /// e.g. "base_link/joint1/child_link/joint2/gripper_link"
     pub link_full_path: String,
-    
+
     /// The local RPY from the last joint that connects to parent
     /// For root link, this will be [0.0, 0.0, 0.0]
     pub local_rpy: [f64; 3],
-    
+
     /// The local translation (XYZ) from the last joint
     /// For root link, this will be [0.0, 0.0, 0.0]
     pub local_translation: [f64; 3],
-    
+
     /// The local transform relative to parent (row-major)
     /// For root link, this will be identity
     pub local_transform: [f32; 16],
-    
+
     /// The global (accumulated) transform from root link (row-major)
     /// For root link, this will be identity
     pub global_transform: [f32; 16],
@@ -77,13 +74,13 @@ pub fn build_link_bfs_map(robot: &Robot) -> (HashMap<String, LinkBfsData>, Vec<S
     let adjacency = build_adjacency(&robot.joints);
 
     // 1) Find root link
-    let root_link = find_root_link_name(&robot.links, &robot.joints)
-        .unwrap_or_else(|| "base".to_string());
+    let root_link =
+        find_root_link_name(&robot.links, &robot.joints).unwrap_or_else(|| "base".to_string());
 
     // 2) BFS from root to discover all link paths and transforms
     let mut link_bfs_map = HashMap::new();
     let mut queue = VecDeque::new();
-    
+
     // Track BFS order
     let mut bfs_order = Vec::new();
 
@@ -97,9 +94,9 @@ pub fn build_link_bfs_map(robot: &Robot) -> (HashMap<String, LinkBfsData>, Vec<S
         local_transform: identity_4x4(),
         global_transform: identity_4x4(),
     };
-    
+
     link_bfs_map.insert(root_link.clone(), root_data);
-    bfs_order.push(root_link.clone());  // Record root in BFS order
+    bfs_order.push(root_link.clone()); // Record root in BFS order
     queue.push_back(root_link);
 
     // 3) BFS traversal
@@ -128,9 +125,7 @@ pub fn build_link_bfs_map(robot: &Robot) -> (HashMap<String, LinkBfsData>, Vec<S
                 let child_link_only_path = format!("{}/{}", parent_link_only_path, child_link_name);
                 let child_link_full_path = format!(
                     "{}/{}/{}",
-                    parent_link_full_path,
-                    joint.name,
-                    child_link_name
+                    parent_link_full_path, joint.name, child_link_name
                 );
 
                 let local_xyz = [
@@ -159,7 +154,7 @@ pub fn build_link_bfs_map(robot: &Robot) -> (HashMap<String, LinkBfsData>, Vec<S
 
                 debug_log_bfs_insertion(&child_data);
                 link_bfs_map.insert(child_link_name.clone(), child_data);
-                bfs_order.push(child_link_name.clone());  // Record child in BFS order
+                bfs_order.push(child_link_name.clone()); // Record child in BFS order
                 queue.push_back(child_link_name);
             }
         }
@@ -179,35 +174,35 @@ pub struct JointInfo {
 /// Build joint info map using the BFS data
 pub fn build_joint_name_to_joint_info(urdf_path: &str) -> Result<HashMap<String, JointInfo>> {
     let robot = urdf_rs::read_file(urdf_path)?;
-    let (link_bfs_map, _bfs_order) = build_link_bfs_map(&robot);  // Destructure the tuple
-    
+    let (link_bfs_map, _bfs_order) = build_link_bfs_map(&robot); // Destructure the tuple
+
     let mut joint_info_map = HashMap::new();
-    
+
     for joint in &robot.joints {
         if let Some(child_data) = link_bfs_map.get(&joint.child.link) {
             let entity_path = child_data.link_only_path.clone();
-            
+
             let translation = [
                 joint.origin.xyz[0] as f32,
                 joint.origin.xyz[1] as f32,
                 joint.origin.xyz[2] as f32,
             ];
-            
+
             let base_rotation = rotation_from_euler_xyz(
                 joint.origin.rpy[0],
                 joint.origin.rpy[1],
                 joint.origin.rpy[2],
             );
-            
+
             let info = JointInfo {
                 entity_path,
                 origin_translation: translation,
                 base_rotation,
             };
-            
+
             joint_info_map.insert(joint.name.clone(), info);
         }
     }
-    
+
     Ok(joint_info_map)
 }

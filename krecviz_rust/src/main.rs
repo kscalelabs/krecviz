@@ -1,16 +1,16 @@
 use anyhow::Result;
 use clap::Parser;
 use env_logger::{Builder, Env};
-use rerun::RecordingStream;
 use krec::KRec;
+use rerun::RecordingStream;
 
-use crate::utils::repl_utils::interactive_transform_repl;
-use crate::urdf_logger::parse_and_log_urdf_hierarchy;
 use crate::krec_logger::parse_and_log_krec;
+use crate::urdf_logger::parse_and_log_urdf_hierarchy;
+use crate::utils::repl_utils::interactive_transform_repl;
 
-mod utils;
-mod urdf_logger;
 mod krec_logger;
+mod urdf_logger;
+mod utils;
 
 // -----------------------------------------------------------------------------
 // CLI
@@ -51,7 +51,10 @@ fn main() -> Result<()> {
         parse_and_log_urdf_hierarchy(urdf_path, &rec)?;
     } else {
         dbg!("No URDF path provided, logging a fallback message.");
-        rec.log("/no_urdf_found", &rerun::TextDocument::new("No URDF provided"))?;
+        rec.log(
+            "/no_urdf_found",
+            &rerun::TextDocument::new("No URDF provided"),
+        )?;
     }
 
     // 3) If we have a KREC, load and parse it

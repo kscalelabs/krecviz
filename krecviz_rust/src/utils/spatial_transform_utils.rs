@@ -84,9 +84,9 @@ pub fn mat4x4_mul(a: [f32; 16], b: [f32; 16]) -> [f32; 16] {
 pub fn decompose_4x4_to_translation_and_mat3x3(tf: [f32; 16]) -> ([f32; 3], [f32; 9]) {
     let translation = [tf[3], tf[7], tf[11]];
     let mat3x3 = [
-        tf[0], tf[4], tf[8],    // First column
-        tf[1], tf[5], tf[9],    // Second column
-        tf[2], tf[6], tf[10],   // Third column
+        tf[0], tf[4], tf[8], // First column
+        tf[1], tf[5], tf[9], // Second column
+        tf[2], tf[6], tf[10], // Third column
     ];
     (translation, mat3x3)
 }
@@ -104,18 +104,33 @@ pub fn build_z_rotation_3x3(angle_rad: f64) -> [f32; 9] {
     let sz = angle_rad.sin() as f32;
 
     [
-        cz, -sz, 0.0,  // First row
-        sz,  cz, 0.0,  // Second row
+        cz, -sz, 0.0, // First row
+        sz, cz, 0.0, // Second row
         0.0, 0.0, 1.0, // Third row
     ]
 }
 
 /// Convert rotation matrix and translation into a 4x4 transform matrix
-pub fn make_4x4_from_rotation_and_translation(rotation: [f32; 9], translation: [f32; 3]) -> [f32; 16] {
+pub fn make_4x4_from_rotation_and_translation(
+    rotation: [f32; 9],
+    translation: [f32; 3],
+) -> [f32; 16] {
     [
-        rotation[0], rotation[1], rotation[2], translation[0],
-        rotation[3], rotation[4], rotation[5], translation[1],
-        rotation[6], rotation[7], rotation[8], translation[2],
-        0.0, 0.0, 0.0, 1.0,
+        rotation[0],
+        rotation[1],
+        rotation[2],
+        translation[0],
+        rotation[3],
+        rotation[4],
+        rotation[5],
+        translation[1],
+        rotation[6],
+        rotation[7],
+        rotation[8],
+        translation[2],
+        0.0,
+        0.0,
+        0.0,
+        1.0,
     ]
 }
