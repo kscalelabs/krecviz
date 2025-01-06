@@ -114,19 +114,31 @@ pub fn parse_and_log_krec(
 
             // 1) Early-exit from "missing" joint_name
             let Some(joint_name) = actuator_map.get(&actuator_id) else {
-                log::warn!("Frame {}: Actuator {} not found in actuator->joint map, skipping", frame_idx, actuator_id);
+                log::warn!(
+                    "Frame {}: Actuator {} not found in actuator->joint map, skipping",
+                    frame_idx,
+                    actuator_id
+                );
                 continue;
             };
 
             // 2) Early-exit from "missing" joint_info
             let Some(joint_info) = joint_info_map.get(*joint_name) else {
-                log::warn!("Frame {}: Joint '{}' not found in URDF joint info map, skipping", frame_idx, joint_name);
+                log::warn!(
+                    "Frame {}: Joint '{}' not found in URDF joint info map, skipping",
+                    frame_idx,
+                    joint_name
+                );
                 continue;
             };
 
             // 3) Early-exit from missing position
             let Some(pos_deg) = state.position else {
-                log::warn!("Frame {}: No position data for actuator {}, skipping", frame_idx, actuator_id);
+                log::warn!(
+                    "Frame {}: No position data for actuator {}, skipping",
+                    frame_idx,
+                    actuator_id
+                );
                 continue;
             };
 
@@ -172,6 +184,9 @@ pub fn parse_and_log_krec(
         }
     }
 
-    info!("Successfully logged {} KREC frames to rerun", frames_processed);
+    info!(
+        "Successfully logged {} KREC frames to rerun",
+        frames_processed
+    );
     Ok(())
 }

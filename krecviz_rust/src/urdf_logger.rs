@@ -13,8 +13,8 @@ use urdf_rs::{self, Geometry, Link, Material, Robot};
 
 use crate::utils::debug_log_utils::{debug_log_rerun_mesh, debug_log_rerun_transform};
 use crate::utils::geometry_utils::{
-    apply_4x4_to_mesh3d, create_box_mesh, create_cylinder_mesh,
-    create_sphere_mesh, float_rgba_to_u8, load_image_as_rerun_buffer, load_stl_as_mesh3d,
+    apply_4x4_to_mesh3d, create_box_mesh, create_cylinder_mesh, create_sphere_mesh,
+    float_rgba_to_u8, load_image_as_rerun_buffer, load_stl_as_mesh3d,
 };
 use crate::utils::spatial_transform_utils::{
     build_4x4_from_xyz_rpy, decompose_4x4_to_translation_and_mat3x3,

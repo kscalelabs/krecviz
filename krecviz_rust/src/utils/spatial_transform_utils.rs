@@ -92,7 +92,7 @@ pub fn build_z_rotation_3x3(angle_rad: f64) -> [f32; 9] {
     let s = angle_rad.sin() as f32;
     [
         c, -s, 0.0, // row 1
-        s, c, 0.0,  // row 2
+        s, c, 0.0, // row 2
         0.0, 0.0, 1.0, // row 3
     ]
 }
