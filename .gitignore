@@ -19,3 +19,7 @@ build/
 dist/
 *.so
 out*/
+
+# rust stuff
+target/
+Cargo.lock

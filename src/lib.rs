@@ -19,7 +19,7 @@ pub fn viz(
     output_path: Option<&str>,
 ) -> Result<()> {
     // 1) Start a Rerun recording
-    let builder = RecordingStreamBuilder::new("rust_krecviz_hierarchy_example");
+    let builder = RecordingStreamBuilder::new("krecviz");
     let rec = if let Some(path) = output_path {
         info!("Creating recording that will be saved to {}", path);
         builder.save(path)?

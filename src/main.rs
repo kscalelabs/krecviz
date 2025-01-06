@@ -8,7 +8,7 @@ use env_logger::{Builder, Env};
 use krecviz::viz;
 
 #[derive(Parser, Debug)]
-#[command(name = "rust_krecviz")]
+#[command(name = "krecviz")]
 struct Args {
     /// Path to the URDF file
     #[arg(long)]
@@ -25,7 +25,7 @@ struct Args {
 
 fn main() -> Result<()> {
     // Initialize logger
-    Builder::from_env(Env::default().default_filter_or("krecviz_rust=info")).init();
+    Builder::from_env(Env::default().default_filter_or("krecviz=info")).init();
 
     // Parse CLI args
     let args = Args::parse();
