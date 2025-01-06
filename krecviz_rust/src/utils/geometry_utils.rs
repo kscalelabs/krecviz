@@ -9,12 +9,16 @@ use rerun::{
 use std::fs::OpenOptions;
 use std::io::BufReader;
 use std::path::Path;
+use nalgebra as na;
+use parry3d::shape::{Ball as ParrySphere, Cuboid as ParryCuboid, Cylinder as ParryCylinder};
 
 // For loading image files
 use image;
 
 // For reading STL geometry
 use stl_io;
+
+use crate::utils::spatial_transform_utils::build_4x4_from_xyz_rpy;
 
 /// Compute the cross product of two 3D vectors.
 pub fn cross(a: [f32; 3], b: [f32; 3]) -> [f32; 3] {
@@ -180,4 +184,75 @@ pub fn load_image_as_rerun_buffer(path: &Path) -> Result<ImageBuffer> {
     let rgba = img.to_rgba8().into_raw();
 
     Ok(ImageBuffer(Blob::from(rgba)))
+}
+
+/// Create a box mesh from dimensions
+pub fn create_box_mesh(size: [f64; 3]) -> Mesh3D {
+    let (sx, sy, sz) = (size[0], size[1], size[2]);
+    let cuboid = ParryCuboid::new(na::Vector3::new(
+        (sx / 2.0) as f32,
+        (sy / 2.0) as f32,
+        (sz / 2.0) as f32,
+    ));
+    let (raw_v, raw_i) = cuboid.to_trimesh();
+    // Convert them to Mesh3D
+    let positions: Vec<Position3D> = raw_v
+        .iter()
+        .map(|p| Position3D::from([p.x, p.y, p.z]))
+        .collect();
+    let indices: Vec<TriangleIndices> = raw_i
+        .iter()
+        .map(|[a, b, c]| TriangleIndices::from([*a, *b, *c]))
+        .collect();
+    let mut mesh = Mesh3D::new(positions).with_triangle_indices(indices);
+
+    // compute normals
+    compute_vertex_normals(&mut mesh);
+    mesh
+}
+
+/// Create a cylinder mesh from radius and length
+pub fn create_cylinder_mesh(radius: f64, length: f64) -> Mesh3D {
+    let half = (length as f32) / 2.0;
+    let cyl = ParryCylinder::new(half, radius as f32);
+    let (raw_v, raw_i) = cyl.to_trimesh(30);
+    let positions: Vec<Position3D> = raw_v
+        .iter()
+        .map(|p| Position3D::from([p.x, p.y, p.z]))
+        .collect();
+    let indices: Vec<TriangleIndices> = raw_i
+        .iter()
+        .map(|[a, b, c]| TriangleIndices::from([*a, *b, *c]))
+        .collect();
+    let mut mesh = Mesh3D::new(positions).with_triangle_indices(indices);
+
+    // pre-rotate so cylinder axis is +Z
+    let rotate_x_90 = build_4x4_from_xyz_rpy(
+        [0.0, 0.0, 0.0],
+        [-std::f64::consts::FRAC_PI_2, 0.0, 0.0],
+    );
+    apply_4x4_to_mesh3d(&mut mesh, rotate_x_90);
+
+    // now compute normals
+    compute_vertex_normals(&mut mesh);
+    mesh
+}
+
+/// Create a sphere mesh from radius
+pub fn create_sphere_mesh(radius: f64) -> Mesh3D {
+    let ball = ParrySphere::new(radius as f32);
+    let (raw_v, raw_i) = ball.to_trimesh(20, 20);
+    let positions: Vec<Position3D> = raw_v
+        .iter()
+        .map(|p| Position3D::from([p.x, p.y, p.z]))
+        .collect();
+    let indices: Vec<TriangleIndices> = raw_i
+        .iter()
+        .map(|[a, b, c]| TriangleIndices::from([*a, *b, *c]))
+        .collect();
+    let mut mesh = Mesh3D::new(positions).with_triangle_indices(indices);
+
+    // compute normals
+    compute_vertex_normals(&mut mesh);
+    mesh
 }

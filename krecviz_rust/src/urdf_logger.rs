@@ -4,11 +4,8 @@ use std::path::{Path, PathBuf};
 
 use anyhow::Result;
 use log::debug;
-use nalgebra as na;
-use parry3d::shape::{Ball as ParrySphere, Cuboid as ParryCuboid, Cylinder as ParryCylinder};
 use rerun::{
     archetypes::{Mesh3D, Transform3D, ViewCoordinates},
-    components::{Position3D, TriangleIndices},
     datatypes::ImageFormat,
     RecordingStream,
 };
@@ -25,6 +22,9 @@ use crate::utils::geometry_utils::{
     float_rgba_to_u8,
     load_image_as_rerun_buffer,
     load_stl_as_mesh3d,
+    create_box_mesh,
+    create_cylinder_mesh,
+    create_sphere_mesh,
 };
 use crate::utils::spatial_transform_utils::{
     build_4x4_from_xyz_rpy,
@@ -105,71 +105,9 @@ pub fn log_link_meshes_at_identity(
                     Mesh3D::new(Vec::<[f32; 3]>::new())
                 }
             }
-            Geometry::Box { size } => {
-                let (sx, sy, sz) = (size[0], size[1], size[2]);
-                let cuboid = ParryCuboid::new(na::Vector3::new(
-                    (sx / 2.0) as f32,
-                    (sy / 2.0) as f32,
-                    (sz / 2.0) as f32,
-                ));
-                let (raw_v, raw_i) = cuboid.to_trimesh();
-                // Convert them to Mesh3D
-                let positions: Vec<Position3D> = raw_v
-                    .iter()
-                    .map(|p| Position3D::from([p.x, p.y, p.z]))
-                    .collect();
-                let indices: Vec<TriangleIndices> = raw_i
-                    .iter()
-                    .map(|[a, b, c]| TriangleIndices::from([*a, *b, *c]))
-                    .collect();
-                let mut mesh = Mesh3D::new(positions).with_triangle_indices(indices);
-
-                // compute normals
-                compute_vertex_normals(&mut mesh);
-                mesh
-            }
-            Geometry::Cylinder { radius, length } => {
-                let half = (*length as f32) / 2.0;
-                let cyl = ParryCylinder::new(half, *radius as f32);
-                let (raw_v, raw_i) = cyl.to_trimesh(30);
-                let positions: Vec<Position3D> = raw_v
-                    .iter()
-                    .map(|p| Position3D::from([p.x, p.y, p.z]))
-                    .collect();
-                let indices: Vec<TriangleIndices> = raw_i
-                    .iter()
-                    .map(|[a, b, c]| TriangleIndices::from([*a, *b, *c]))
-                    .collect();
-                let mut mesh = Mesh3D::new(positions).with_triangle_indices(indices);
-
-                // pre-rotate so cylinder axis is +Z
-                let rotate_x_90 = build_4x4_from_xyz_rpy(
-                    [0.0, 0.0, 0.0],
-                    [-std::f64::consts::FRAC_PI_2, 0.0, 0.0],
-                );
-                apply_4x4_to_mesh3d(&mut mesh, rotate_x_90);
-
-                // now compute normals
-                compute_vertex_normals(&mut mesh);
-                mesh
-            }
-            Geometry::Sphere { radius } => {
-                let ball = ParrySphere::new(*radius as f32);
-                let (raw_v, raw_i) = ball.to_trimesh(20, 20);
-                let positions: Vec<Position3D> = raw_v
-                    .iter()
-                    .map(|p| Position3D::from([p.x, p.y, p.z]))
-                    .collect();
-                let indices: Vec<TriangleIndices> = raw_i
-                    .iter()
-                    .map(|[a, b, c]| TriangleIndices::from([*a, *b, *c]))
-                    .collect();
-                let mut mesh = Mesh3D::new(positions).with_triangle_indices(indices);
-
-                // compute normals
-                compute_vertex_normals(&mut mesh);
-                mesh
-            }
+            Geometry::Box { size } => create_box_mesh([size[0], size[1], size[2]]),
+            Geometry::Cylinder { radius, length } => create_cylinder_mesh(*radius, *length),
+            Geometry::Sphere { radius } => create_sphere_mesh(*radius),
             _ => {
                 eprintln!("Unsupported geometry type");
                 Mesh3D::new(Vec::<[f32; 3]>::new())
