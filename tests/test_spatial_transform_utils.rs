@@ -2,27 +2,18 @@
 
 #[cfg(test)]
 mod test_spatial_transform_utils {
-    use std::f64::consts::{FRAC_PI_2, FRAC_PI_6}; // 90°, 30°
     use krecviz::utils::spatial_transform_utils::{
-        mat3x3_mul, mat4x4_mul, identity_4x4, build_z_rotation_3x3,
-        rotation_from_euler_xyz, build_4x4_from_xyz_rpy,
-        decompose_4x4_to_translation_and_mat3x3,
-        make_4x4_from_rotation_and_translation,
+        build_4x4_from_xyz_rpy, build_z_rotation_3x3, decompose_4x4_to_translation_and_mat3x3,
+        identity_4x4, make_4x4_from_rotation_and_translation, mat3x3_mul, mat4x4_mul,
+        rotation_from_euler_xyz,
     };
+    use std::f64::consts::{FRAC_PI_2, FRAC_PI_6}; // 90°, 30°
 
     /// Test multiplying a 3x3 matrix by the identity matrix.
     #[test]
     fn test_mat3x3_mul_identity() {
-        let id_3x3 = [
-            1.0, 0.0, 0.0,
-            0.0, 1.0, 0.0,
-            0.0, 0.0, 1.0,
-        ];
-        let a_3x3 = [
-            1.0, 2.0, 3.0,
-            4.0, 5.0, 6.0,
-            7.0, 8.0, 9.0,
-        ];
+        let id_3x3 = [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0];
+        let a_3x3 = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
 
         let result = mat3x3_mul(a_3x3, id_3x3);
         assert_eq!(
@@ -35,16 +26,8 @@ mod test_spatial_transform_utils {
     #[test]
     fn test_mat3x3_mul_arbitrary() {
         // Define two 3x3 row-major matrices
-        let a = [
-            1.0,  2.0,  3.0,
-            4.0,  5.0,  6.0,
-            7.0,  8.0,  9.0,
-        ];
-        let b = [
-            9.0,  8.0,  7.0,
-            6.0,  5.0,  4.0,
-            3.0,  2.0,  1.0,
-        ];
+        let a = [1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0];
+        let b = [9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0];
         // Ground truth computed as follows:
         // $ python
         // Python 3.11.11 (main, Dec 11 2024, 16:28:39) [GCC 11.2.0] on linux
@@ -56,11 +39,7 @@ mod test_spatial_transform_utils {
         // array([[ 30,  24,  18],
         //        [ 84,  69,  54],
         //        [138, 114,  90]])
-        let expected = [
-            30.0, 24.0, 18.0,
-            84.0, 69.0, 54.0,
-            138.0, 114.0, 90.0,
-        ];
+        let expected = [30.0, 24.0, 18.0, 84.0, 69.0, 54.0, 138.0, 114.0, 90.0];
 
         let result = mat3x3_mul(a, b);
         for i in 0..9 {
@@ -68,7 +47,9 @@ mod test_spatial_transform_utils {
             assert!(
                 diff < 1e-6,
                 "Mismatch at index {} in mat3x3_mul_arbitrary: got={}, expected={}",
-                i, result[i], expected[i]
+                i,
+                result[i],
+                expected[i]
             );
         }
     }
@@ -78,10 +59,7 @@ mod test_spatial_transform_utils {
     fn test_mat4x4_mul_identity() {
         let id_4x4 = identity_4x4();
         let a_4x4 = [
-            1.0,  2.0,  3.0,  4.0,
-            5.0,  6.0,  7.0,  8.0,
-            9.0, 10.0, 11.0, 12.0,
-            13.0, 14.0, 15.0, 16.0,
+            1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0,
         ];
 
         let result = mat4x4_mul(a_4x4, id_4x4);
@@ -95,16 +73,10 @@ mod test_spatial_transform_utils {
     #[test]
     fn test_mat4x4_mul_arbitrary() {
         let a = [
-            1.0, 2.0, 3.0, 4.0,
-            5.0, 6.0, 7.0, 8.0,
-            9.0, 10.0, 11.0, 12.0,
-            13.0, 14.0, 15.0, 16.0,
+            1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0, 11.0, 12.0, 13.0, 14.0, 15.0, 16.0,
         ];
         let b = [
-            16.0, 15.0, 14.0, 13.0,
-            12.0, 11.0, 10.0, 9.0,
-            8.0, 7.0, 6.0, 5.0,
-            4.0, 3.0, 2.0, 1.0,
+            16.0, 15.0, 14.0, 13.0, 12.0, 11.0, 10.0, 9.0, 8.0, 7.0, 6.0, 5.0, 4.0, 3.0, 2.0, 1.0,
         ];
         // Ground truth computed as follows:
         // $ python
@@ -119,10 +91,8 @@ mod test_spatial_transform_utils {
         //        [400, 358, 316, 274],
         //        [560, 502, 444, 386]])
         let expected = [
-            80.0,  70.0,  60.0,  50.0,
-            240.0, 214.0, 188.0, 162.0,
-            400.0, 358.0, 316.0, 274.0,
-            560.0, 502.0, 444.0, 386.0,
+            80.0, 70.0, 60.0, 50.0, 240.0, 214.0, 188.0, 162.0, 400.0, 358.0, 316.0, 274.0, 560.0,
+            502.0, 444.0, 386.0,
         ];
 
         let result = mat4x4_mul(a, b);
@@ -131,7 +101,9 @@ mod test_spatial_transform_utils {
             assert!(
                 diff < 1e-6,
                 "Mismatch at index {} in mat4x4_mul_arbitrary: got={}, expected={}",
-                i, result[i], expected[i]
+                i,
+                result[i],
+                expected[i]
             );
         }
     }
@@ -148,18 +120,16 @@ mod test_spatial_transform_utils {
         //   [0, -1, 0,
         //    1,  0, 0,
         //    0,  0, 1]
-        let expected = [
-            0.0, -1.0,  0.0,
-            1.0,  0.0,  0.0,
-            0.0,  0.0,  1.0,
-        ];
+        let expected = [0.0, -1.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0];
 
         for i in 0..9 {
             let diff = (rot_90[i] - expected[i]).abs();
             assert!(
                 diff < 1e-6,
                 "Index {} mismatch in build_z_rotation_3x3: got={}, expected={}",
-                i, rot_90[i], expected[i]
+                i,
+                rot_90[i],
+                expected[i]
             );
         }
     }
@@ -173,22 +143,20 @@ mod test_spatial_transform_utils {
         let rz = 0.0;
         let rot = rotation_from_euler_xyz(rx, ry, rz);
 
-        // A 90° rotation around X in row-major => 
+        // A 90° rotation around X in row-major =>
         //   [1,  0,   0,
         //    0,  0,  -1,
         //    0,  1,   0]
-        let expected = [
-            1.0,  0.0,  0.0,
-            0.0,  0.0, -1.0,
-            0.0,  1.0,  0.0,
-        ];
+        let expected = [1.0, 0.0, 0.0, 0.0, 0.0, -1.0, 0.0, 1.0, 0.0];
 
         for i in 0..9 {
             let diff = (rot[i] - expected[i]).abs();
             assert!(
                 diff < 1e-6,
                 "Index {} mismatch in rotation_from_euler_xyz(90,0,0). got={}, expected={}",
-                i, rot[i], expected[i]
+                i,
+                rot[i],
+                expected[i]
             );
         }
     }
@@ -200,34 +168,28 @@ mod test_spatial_transform_utils {
         let xyz = [1.0, 2.0, 3.0];
         let rpy = [0.0, 0.0, FRAC_PI_6]; // 30° about Z
         let tf = build_4x4_from_xyz_rpy(xyz, rpy);
-    
+
         // cos(30°) ≈ 0.8660254, sin(30°) = 0.5
         let c = FRAC_PI_6.cos() as f32;
         let s = FRAC_PI_6.sin() as f32;
-    
+
         // Check translation in row-major => tf[3], tf[7], tf[11]
         assert!((tf[3] - 1.0).abs() < 1e-6, "X translation mismatch");
         assert!((tf[7] - 2.0).abs() < 1e-6, "Y translation mismatch");
         assert!((tf[11] - 3.0).abs() < 1e-6, "Z translation mismatch");
-    
+
         // The top-left 3x3 should be a 30° rotation around Z:
         //   [ cos(30°), -sin(30°),  0 ]
         //   [ sin(30°),  cos(30°),  0 ]
         //   [    0,          0,     1 ]
         let row0 = [tf[0], tf[1], tf[2]];
-        assert!((row0[0] - c).abs()    < 1e-6 &&
-                (row0[1] + s).abs()    < 1e-6 &&
-                 row0[2].abs()         < 1e-6);
-    
+        assert!((row0[0] - c).abs() < 1e-6 && (row0[1] + s).abs() < 1e-6 && row0[2].abs() < 1e-6);
+
         let row1 = [tf[4], tf[5], tf[6]];
-        assert!((row1[0] - s).abs()    < 1e-6 &&
-                (row1[1] - c).abs()    < 1e-6 &&
-                 row1[2].abs()         < 1e-6);
-    
+        assert!((row1[0] - s).abs() < 1e-6 && (row1[1] - c).abs() < 1e-6 && row1[2].abs() < 1e-6);
+
         let row2 = [tf[8], tf[9], tf[10]];
-        assert!( row2[0].abs()         < 1e-6 &&
-                 row2[1].abs()         < 1e-6 &&
-                (row2[2] - 1.0).abs()  < 1e-6);
+        assert!(row2[0].abs() < 1e-6 && row2[1].abs() < 1e-6 && (row2[2] - 1.0).abs() < 1e-6);
     }
 
     /// Test decompose_4x4_to_translation_and_mat3x3 on a known 4x4 transform.
@@ -241,19 +203,15 @@ mod test_spatial_transform_utils {
         let (translation, mat3x3) = decompose_4x4_to_translation_and_mat3x3(full_tf);
         assert!(
             (translation[0] - 2.0).abs() < 1e-6
-            && (translation[1] + 3.0).abs() < 1e-6
-            && (translation[2] - 5.0).abs() < 1e-6,
+                && (translation[1] + 3.0).abs() < 1e-6
+                && (translation[2] - 5.0).abs() < 1e-6,
             "Translation mismatch in decompose_4x4_to_translation_and_mat3x3"
         );
-        // 90° about X => column-major => 
+        // 90° about X => column-major =>
         //  [ 1,  0,  0,
         //    0,  0, 1,
         //    0, -1,  0]
-        let expected_3x3 = [
-            1.0,  0.0,  0.0,
-            0.0,  0.0, 1.0,
-            0.0,  -1.0,  0.0,
-        ];
+        let expected_3x3 = [1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, -1.0, 0.0];
         for i in 0..9 {
             let diff = (mat3x3[i] - expected_3x3[i]).abs();
             assert!(
@@ -270,33 +228,31 @@ mod test_spatial_transform_utils {
         // We'll build a small 3x3 rotation => 30° about Z
         let c = FRAC_PI_6.cos() as f32;
         let s = FRAC_PI_6.sin() as f32;
-        let rotation_3x3 = [
-            c, -s, 0.0,
-            s,  c, 0.0,
-            0.0, 0.0, 1.0,
-        ];
+        let rotation_3x3 = [c, -s, 0.0, s, c, 0.0, 0.0, 0.0, 1.0];
         let translation_3 = [1.0_f32, -2.0_f32, 3.0_f32];
 
         let final_tf = make_4x4_from_rotation_and_translation(rotation_3x3, translation_3);
         // Verify final_tf's top-left 3x3
         assert!((final_tf[0] - c).abs() < 1e-6, "M[0,0] mismatch");
         assert!((final_tf[1] + s).abs() < 1e-6, "M[0,1] mismatch");
-        assert!(final_tf[2].abs() < 1e-6,       "M[0,2] mismatch");
+        assert!(final_tf[2].abs() < 1e-6, "M[0,2] mismatch");
         assert!((final_tf[4] - s).abs() < 1e-6, "M[1,0] mismatch");
         assert!((final_tf[5] - c).abs() < 1e-6, "M[1,1] mismatch");
-        assert!(final_tf[6].abs() < 1e-6,       "M[1,2] mismatch");
+        assert!(final_tf[6].abs() < 1e-6, "M[1,2] mismatch");
         // 2nd row => [0,0,1]
-        assert!(final_tf[8].abs() < 1e-6,       "M[2,0] mismatch");
-        assert!(final_tf[9].abs() < 1e-6,       "M[2,1] mismatch");
+        assert!(final_tf[8].abs() < 1e-6, "M[2,0] mismatch");
+        assert!(final_tf[9].abs() < 1e-6, "M[2,1] mismatch");
         assert!((final_tf[10] - 1.0).abs() < 1e-6, "M[2,2] mismatch");
 
         // Check translation => row-major => indices [3, 7, 11]
         assert!((final_tf[3] - 1.0).abs() < 1e-6, "X mismatch");
-        assert!((final_tf[7] + 2.0).abs() < 1e-6,  "Y mismatch");
+        assert!((final_tf[7] + 2.0).abs() < 1e-6, "Y mismatch");
         assert!((final_tf[11] - 3.0).abs() < 1e-6, "Z mismatch");
 
         // The last row should remain [0, 0, 0, 1]
-        assert!(final_tf[12].abs() < 1e-6 && final_tf[13].abs() < 1e-6 && final_tf[14].abs() < 1e-6);
+        assert!(
+            final_tf[12].abs() < 1e-6 && final_tf[13].abs() < 1e-6 && final_tf[14].abs() < 1e-6
+        );
         assert!((final_tf[15] - 1.0).abs() < 1e-6, "M[3,3] mismatch");
     }
 }

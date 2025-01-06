@@ -2,9 +2,9 @@
 
 #[cfg(test)]
 mod test_urdf_bfs_utils {
-    use std::path::PathBuf;
     use krecviz::utils::urdf_bfs_utils::{build_link_bfs_map, find_root_link_name};
-    use urdf_rs::{read_from_string, read_file};
+    use std::path::PathBuf;
+    use urdf_rs::{read_file, read_from_string};
 
     #[test]
     fn test_minimal_urdf_bfs() {
@@ -24,8 +24,8 @@ mod test_urdf_bfs_utils {
         let robot = read_from_string(urdf_str).expect("Failed to parse minimal URDF string");
 
         // 1) Confirm root link is 'base_link'
-        let root_name = find_root_link_name(&robot.links, &robot.joints)
-            .expect("No root link found?");
+        let root_name =
+            find_root_link_name(&robot.links, &robot.joints).expect("No root link found?");
         assert_eq!(root_name, "base_link");
 
         // 2) Build BFS data
@@ -38,7 +38,9 @@ mod test_urdf_bfs_utils {
         assert_eq!(bfs_order, vec!["base_link", "link_1"]);
 
         // Check the data for 'link_1'
-        let link1_data = bfs_map.get("link_1").expect("Missing BFS data for 'link_1'");
+        let link1_data = bfs_map
+            .get("link_1")
+            .expect("Missing BFS data for 'link_1'");
         assert_eq!(link1_data.link_name, "link_1");
         assert_eq!(link1_data.link_only_path, "base_link/link_1");
 
@@ -66,8 +68,8 @@ mod test_urdf_bfs_utils {
         let robot = read_file(urdf_path).expect("Failed to parse manual_example.urdf");
 
         // 2) Identify the root link
-        let root = find_root_link_name(&robot.links, &robot.joints)
-            .expect("No root link found in URDF?");
+        let root =
+            find_root_link_name(&robot.links, &robot.joints).expect("No root link found in URDF?");
         assert_eq!(root, "base", "Root link should be 'base'.");
 
         // 3) Build BFS map & BFS order
