@@ -6,16 +6,16 @@ use krecviz::parse_and_log_urdf_hierarchy;
 
 const BASE_PATH: &str = env!("CARGO_MANIFEST_DIR");
 const URDF_BASE_PATH: &str = "tests/assets/urdf_examples";
-const KREC_BASE_PATH: &str = "tests/assets/krec_examples";
+// const KREC_BASE_PATH: &str = "tests/assets/krec_examples";
 
-fn get_krec_path(key: &str) -> String {
-    match key {
-        "gpr" => format!(
-            "{BASE_PATH}/{KREC_BASE_PATH}/actuator_22_right_arm_shoulder_roll_movement.krec"
-        ),
-        _ => panic!("Unknown KREC key: {}", key),
-    }
-}
+// fn get_krec_path(key: &str) -> String {
+//     match key {
+//         "gpr" => format!(
+//             "{BASE_PATH}/{KREC_BASE_PATH}/actuator_22_right_arm_shoulder_roll_movement.krec"
+//         ),
+//         _ => panic!("Unknown KREC key: {}", key),
+//     }
+// }
 
 fn get_urdf_path(key: &str) -> String {
     match key {
