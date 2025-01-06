@@ -3,7 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 use anyhow::Result;
-use log::debug;
+use log::info;
 use rerun::{
     archetypes::{Mesh3D, Transform3D, ViewCoordinates},
     datatypes::ImageFormat,
@@ -11,11 +11,9 @@ use rerun::{
 };
 use urdf_rs::{self, Geometry, Link, Material, Robot};
 
-use crate::utils::debug_log_utils::{
-    debug_log_bfs_insertion, debug_log_rerun_mesh, debug_log_rerun_transform,
-};
+use crate::utils::debug_log_utils::{debug_log_rerun_mesh, debug_log_rerun_transform};
 use crate::utils::geometry_utils::{
-    apply_4x4_to_mesh3d, compute_vertex_normals, create_box_mesh, create_cylinder_mesh,
+    apply_4x4_to_mesh3d, create_box_mesh, create_cylinder_mesh,
     create_sphere_mesh, float_rgba_to_u8, load_image_as_rerun_buffer, load_stl_as_mesh3d,
 };
 use crate::utils::spatial_transform_utils::{
@@ -49,7 +47,6 @@ pub fn log_link_meshes_at_identity(
         .unwrap_or_else(|| panic!("No BFS data for link '{}'", link.name));
 
     let entity_path = link_bfs_data.link_only_path.clone();
-    let bfs_chain_for_debug_base = link_bfs_data.link_full_path.clone();
 
     // 2) For each visual in this link, create and log geometry
     for (i, vis) in link.visual.iter().enumerate() {
@@ -69,7 +66,7 @@ pub fn log_link_meshes_at_identity(
 
         // Build geometry info
         let mut mesh3d = match &vis.geometry {
-            Geometry::Mesh { filename, scale } => {
+            Geometry::Mesh { filename, scale: _ } => {
                 let joined = urdf_dir.join(filename);
                 // canonicalize will remove things like "../"
                 let abs_path = match fs::canonicalize(&joined) {
@@ -162,8 +159,7 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
     // Build BFS data once
     let (link_bfs_map, bfs_order) = build_link_bfs_map(&robot);
 
-    println!("======================");
-    println!("Stage1: log geometry at identity");
+    info!("Logging URDF geometry at identity");
 
     let urdf_dir = Path::new(urdf_path)
         .parent()
@@ -182,8 +178,7 @@ pub fn parse_and_log_urdf_hierarchy(urdf_path: &str, rec: &RecordingStream) -> R
     }
 
     // Stage 2: Apply transforms in BFS order
-    println!("======================");
-    println!("Stage2: BFS apply transforms");
+    info!("Logging URDF transforms");
 
     for link_name in &bfs_order {
         let link_data = &link_bfs_map[link_name];

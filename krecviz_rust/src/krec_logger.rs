@@ -2,6 +2,7 @@
 
 use anyhow::Result;
 use krec::KRec;
+use log::info;
 use rerun::RecordingStream;
 use std::collections::HashMap;
 use std::f64::consts::PI;
@@ -99,29 +100,33 @@ pub fn parse_and_log_krec(
         HashMap::new()
     };
 
+    let mut frames_processed = 0;
+
     // Iterate frames
     for (frame_idx, frame) in krec.frames.iter().enumerate() {
         // Set Rerun time-sequence so transforms appear "animated"
         rec.set_time_sequence("frame_idx", frame_idx as i64);
+
+        let mut frame_had_valid_data = false;
 
         for state in &frame.actuator_states {
             let actuator_id = state.actuator_id;
 
             // 1) Early-exit from "missing" joint_name
             let Some(joint_name) = actuator_map.get(&actuator_id) else {
-                // If this actuator_id isn't in our map, skip it
+                log::warn!("Frame {}: Actuator {} not found in actuator->joint map, skipping", frame_idx, actuator_id);
                 continue;
             };
 
             // 2) Early-exit from "missing" joint_info
             let Some(joint_info) = joint_info_map.get(*joint_name) else {
-                // If we don't know how to handle this joint, skip it
+                log::warn!("Frame {}: Joint '{}' not found in URDF joint info map, skipping", frame_idx, joint_name);
                 continue;
             };
 
             // 3) Early-exit from missing position
             let Some(pos_deg) = state.position else {
-                // No position -> skip
+                log::warn!("Frame {}: No position data for actuator {}, skipping", frame_idx, actuator_id);
                 continue;
             };
 
@@ -158,8 +163,15 @@ pub fn parse_and_log_krec(
                 state.velocity,
                 state.torque,
             )?;
+
+            frame_had_valid_data = true;
+        }
+
+        if frame_had_valid_data {
+            frames_processed += 1;
         }
     }
 
+    info!("Successfully logged {} KREC frames to rerun", frames_processed);
     Ok(())
 }

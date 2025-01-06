@@ -52,18 +52,6 @@ pub fn build_4x4_from_xyz_rpy(xyz: [f64; 3], rpy: [f64; 3]) -> [f32; 16] {
     ]
 }
 
-// -----------------------------------------------------------------------------
-// Minimal 4x4 row-major transform builder that just rotates around Z
-// -----------------------------------------------------------------------------
-pub fn build_z_rotation_4x4(angle_rad: f64) -> [f32; 16] {
-    let cz = angle_rad.cos() as f32;
-    let sz = angle_rad.sin() as f32;
-
-    [
-        cz, -sz, 0.0, 0.0, sz, cz, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0,
-    ]
-}
-
 /// Multiply two 4×4 matrices (row-major).
 pub fn mat4x4_mul(a: [f32; 16], b: [f32; 16]) -> [f32; 16] {
     let mut out = [0.0; 16];
@@ -100,13 +88,12 @@ pub fn identity_4x4() -> [f32; 16] {
 
 /// Build a 3×3 rotation matrix that just rotates around Z
 pub fn build_z_rotation_3x3(angle_rad: f64) -> [f32; 9] {
-    let cz = angle_rad.cos() as f32;
-    let sz = angle_rad.sin() as f32;
-
+    let c = angle_rad.cos() as f32;
+    let s = angle_rad.sin() as f32;
     [
-        cz, -sz, 0.0, // First row
-        sz, cz, 0.0, // Second row
-        0.0, 0.0, 1.0, // Third row
+        c, -s, 0.0, // row 1
+        s, c, 0.0,  // row 2
+        0.0, 0.0, 1.0, // row 3
     ]
 }
 

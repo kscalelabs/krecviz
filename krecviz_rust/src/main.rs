@@ -2,7 +2,7 @@ use anyhow::Result;
 use clap::Parser;
 use env_logger::{Builder, Env};
 use krec::KRec;
-use rerun::RecordingStream;
+use log::{info, warn};
 
 use crate::krec_logger::parse_and_log_krec;
 use crate::urdf_logger::parse_and_log_urdf_hierarchy;
@@ -37,7 +37,7 @@ struct Args {
 
 fn main() -> Result<()> {
     // Initialize logger with custom filter
-    Builder::from_env(Env::default().default_filter_or("krecviz_rust=debug")).init();
+    Builder::from_env(Env::default().default_filter_or("krecviz_rust=info")).init();
 
     // Show the parsed CLI args
     let args = Args::parse();
@@ -47,10 +47,10 @@ fn main() -> Result<()> {
 
     // 2) If we have a URDF, parse & log it hierarchically
     if let Some(urdf_path) = &args.urdf {
-        dbg!(urdf_path);
+        info!("Loading URDF from {}", urdf_path);
         parse_and_log_urdf_hierarchy(urdf_path, &rec)?;
     } else {
-        dbg!("No URDF path provided, logging a fallback message.");
+        warn!("No URDF path provided!");
         rec.log(
             "/no_urdf_found",
             &rerun::TextDocument::new("No URDF provided"),
@@ -59,12 +59,13 @@ fn main() -> Result<()> {
 
     // 3) If we have a KREC, load and parse it
     if let Some(krec_path) = &args.krec {
-        dbg!(krec_path);
+        info!("Loading KREC from {}", krec_path);
         let loaded_krec = KRec::load(krec_path)
             .map_err(|e| anyhow::anyhow!("Failed to load KREC from {:?}: {:?}", krec_path, e))?;
+        info!("Loaded KREC with {} frames", loaded_krec.frames.len());
         parse_and_log_krec(&loaded_krec, args.urdf.as_deref(), &rec)?;
     } else {
-        dbg!("No KREC path provided, so no frame-by-frame animation is logged.");
+        warn!("No KREC path provided, no telemetry will be logged!");
     }
 
     // REPL to apply transforms to the URDF
