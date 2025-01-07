@@ -1,4 +1,4 @@
-"""Modified version of the URDF logger.
+"""Modified version of the URDF logger, with extra print statements before each Rerun log call.
 
 Taken from:
 https://github.com/rerun-io/rerun-loader-python-example-urdf
@@ -8,19 +8,145 @@ from __future__ import annotations
 
 import argparse
 import logging
+import math
 import sys
 from pathlib import Path
 
 import numpy as np
-import rerun as rr  # pip install rerun-sdk
-import scipy.spatial.transform as st
+import rerun as rr
 import trimesh
-from PIL import Image
 from urdf_parser_py import urdf as urdf_parser  # type: ignore[import-untyped]
+
+# Add logging configuration at the top level
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
+
+
+# Separate debug-print functions.
+def debug_print_log_view_coordinates(
+    entity_path_val: str, entity_val: rr.components.view_coordinates.ViewCoordinates, timeless_val: bool
+) -> None:
+    """Print debug info before calling rr.log(...) for the root view coordinates."""
+    logging.debug("======================")
+    logging.debug("rerun_log")
+    logging.debug("entity_path = self.add_entity_path_prefix(\"\") with value '%s'", entity_path_val)
+    logging.debug("entity = rr.ViewCoordinates.RIGHT_HAND_Z_UP with value %s", entity_val)
+    logging.debug("timeless = %s", timeless_val)
+
+
+def debug_print_log_joint(
+    entity_path_w_prefix: str,
+    joint: urdf_parser.Joint,
+    translation: list[float] | None,
+    rotation: list[list[float]] | None,
+) -> None:
+    """Print debug info before logging the Transform3D of a joint."""
+    logging.debug("======================")
+    logging.debug("rerun_log")
+    logging.debug("entity_path = entity_path_w_prefix with value '%s'", entity_path_w_prefix)
+    logging.debug("Original joint RPY values:")
+    if joint.origin is not None and joint.origin.rpy is not None:
+        logging.debug("  => rpy = %s", [round(float(x), 3) for x in joint.origin.rpy])
+    else:
+        logging.debug("  => rpy = None")
+
+    logging.debug("entity = rr.Transform3D with:")
+    logging.debug("  translation: %s", [f"{x:>8.3f}" for x in translation] if translation else None)
+    logging.debug("  mat3x3:")
+    if rotation:
+        for row in rotation:
+            logging.debug("    [%s]", ", ".join(f"{x:>8.3f}" for x in row))
+    else:
+        logging.debug("    None")
+
+
+def debug_print_unsupported_geometry(entity_path_val: str, log_text: str) -> None:
+    """Print debug info for the 'Unsupported geometry' case before logging rr.TextLog."""
+    logging.debug("======================")
+    logging.debug("rerun_log")
+    logging.debug("entity_path = self.add_entity_path_prefix(\"\") with value '%s'", entity_path_val)
+    logging.debug("entity = rr.TextLog(...) with value '%s'", log_text)
+
+
+def debug_print_log_trimesh(
+    entity_path: str, mesh3d_entity: rr.Mesh3D, timeless_val: bool, mesh: trimesh.Trimesh
+) -> None:
+    """Print debug info prior to rr.log(...) a single Trimesh."""
+    logging.debug("======================")
+    logging.debug("rerun_log log_trimesh")
+    logging.debug("entity_path = entity_path with value '%s'", entity_path)
+    logging.debug("entity = rr.Mesh3D(...) with these numeric values:")
+
+    first_three_vertices = mesh.vertices[:3].tolist()
+    logging.debug("  => vertex_positions (first 3):")
+    for vertex in first_three_vertices:
+        logging.debug("      [%s]", ", ".join(f"{x:>7.3f}" for x in vertex))
+
+    logging.debug("timeless = %s", timeless_val)
+
+
+def debug_print_final_link_transform(link_name: str, chain: list[str], final_tf: np.ndarray) -> None:
+    """Print the final transform accumulated for a link."""
+    logging.debug("Link '%s': BFS chain = %s", link_name, chain)
+    logging.debug("  => final_tf (4x4) =")
+    for row in final_tf:
+        logging.debug("  [%8.3f %8.3f %8.3f %8.3f]", *row)
+    logging.debug("")
+
+
+def rotation_from_euler_xyz(rpy: list[float] | tuple[float, float, float]) -> np.ndarray:
+    """Convert Euler angles to a 3x3 rotation matrix using XYZ rotation sequence.
+
+    Args:
+        rpy: List or tuple of 3 Euler angles [rx, ry, rz] in radians, representing rotations
+             around the X, Y and Z axes respectively.
+
+    Returns:
+        np.ndarray: A 3x3 rotation matrix representing the combined rotation, computed as
+                   R = Rz @ Ry @ Rx (right-to-left multiplication order).
+
+    Note:
+        This follows the extrinsic/fixed XYZ convention, where rotations are applied in order:
+        1. First rotate around X axis by rx
+        2. Then rotate around Y axis by ry
+        3. Finally rotate around Z axis by rz
+    """
+    rx, ry, rz = rpy
+
+    cx, sx = math.cos(rx), math.sin(rx)
+    cy, sy = math.cos(ry), math.sin(ry)
+    cz, sz = math.cos(rz), math.sin(rz)
+
+    r_x = np.array(
+        [
+            [1, 0, 0],
+            [0, cx, -sx],
+            [0, sx, cx],
+        ],
+        dtype=np.float64,
+    )
+    r_y = np.array(
+        [
+            [cy, 0, sy],
+            [0, 1, 0],
+            [-sy, 0, cy],
+        ],
+        dtype=np.float64,
+    )
+    r_z = np.array(
+        [
+            [cz, -sz, 0],
+            [sz, cz, 0],
+            [0, 0, 1],
+        ],
+        dtype=np.float64,
+    )
+
+    # Final rotation = Rz @ Ry @ Rx
+    return r_z @ r_y @ r_x
 
 
 class URDFLogger:
-    """Class to log a URDF to Rerun."""
+    """Class to log a URDF to Rerun, with debug prints before each log call."""
 
     def __init__(self, filepath: str, entity_path_prefix: str = "") -> None:
         self.filepath = Path(filepath).resolve()
@@ -49,25 +175,38 @@ class URDFLogger:
 
     def log(self) -> None:
         """Log a URDF file to Rerun."""
+        # Log the "root" coordinates
+        entity_path_val = self.add_entity_path_prefix("")
+        entity_val = rr.ViewCoordinates.RIGHT_HAND_Z_UP
+        timeless_val = True
+
+        # --- CHANGED ---
+        # Now we call our debug-print function instead of inlining the prints:
+        debug_print_log_view_coordinates(entity_path_val, entity_val, timeless_val)
+
         rr.log(
-            self.add_entity_path_prefix(""),
-            rr.ViewCoordinates.RIGHT_HAND_Z_UP,
-            timeless=True,
+            entity_path=entity_path_val,
+            entity=entity_val,
         )
 
-        for joint in self.urdf.joints:
-            entity_path = self.joint_entity_path(joint)
-            self.log_joint(entity_path, joint)
-
+        # Now log links
         for link in self.urdf.links:
             entity_path = self.link_entity_path(link)
             self.log_link(entity_path, link)
 
+        # Now log joints
+        for joint in self.urdf.joints:
+            entity_path = self.joint_entity_path(joint)
+            self.log_joint(entity_path, joint)
+
+        # Print final transforms
+        self.print_final_link_transforms()
+
     def log_link(self, entity_path: str, link: urdf_parser.Link) -> None:
         """Log a URDF link to Rerun."""
-        # create one mesh out of all visuals
         for i, visual in enumerate(link.visuals):
-            self.log_visual(entity_path + f"/visual_{i}", visual)
+            visual_path = entity_path + f"/visual_{i}"
+            self.log_visual(visual_path, visual)
 
     def log_joint(self, entity_path: str, joint: urdf_parser.Joint) -> None:
         """Log a URDF joint to Rerun."""
@@ -78,17 +217,19 @@ class URDFLogger:
             translation = [float(x) for x in joint.origin.xyz]
 
         if joint.origin is not None and joint.origin.rpy is not None:
-            rotation_matrix = st.Rotation.from_euler("xyz", joint.origin.rpy).as_matrix()
+            rotation_matrix = rotation_from_euler_xyz(joint.origin.rpy)
             rotation = [[float(x) for x in row] for row in rotation_matrix]
 
         entity_path_w_prefix = self.add_entity_path_prefix(entity_path)
-
         if isinstance(translation, list) and isinstance(rotation, list):
             self.entity_to_transform[entity_path_w_prefix] = (translation, rotation)
 
+        debug_print_log_joint(entity_path_w_prefix, joint, translation, rotation)
+
+        transform_3d = rr.Transform3D(translation=translation, mat3x3=rotation)
         rr.log(
-            entity_path_w_prefix,
-            rr.Transform3D(translation=translation, mat3x3=rotation),
+            entity_path=entity_path_w_prefix,
+            entity=transform_3d,
         )
 
     def log_visual(self, entity_path: str, visual: urdf_parser.Visual) -> None:
@@ -104,8 +245,9 @@ class URDFLogger:
         if visual.origin is not None and visual.origin.xyz is not None:
             transform[:3, 3] = visual.origin.xyz
         if visual.origin is not None and visual.origin.rpy is not None:
-            transform[:3, :3] = st.Rotation.from_euler("xyz", visual.origin.rpy).as_matrix()
+            transform[:3, :3] = rotation_from_euler_xyz(visual.origin.rpy)
 
+        # Geometry handling (same as original)
         if isinstance(visual.geometry, urdf_parser.Mesh):
             resolved_path = self.resolve_ros_path(visual.geometry.filename)
             mesh_scale = visual.geometry.scale
@@ -124,37 +266,20 @@ class URDFLogger:
                 radius=visual.geometry.radius,
             )
         else:
-            rr.log(
-                self.add_entity_path_prefix(""),
-                rr.TextLog("Unsupported geometry type: " + str(type(visual.geometry))),
-            )
-            mesh_or_scene = trimesh.Trimesh()
+            raise ValueError(f"Unsupported geometry type: {type(visual.geometry)}")
 
-        if isinstance(mesh_or_scene, trimesh.Scene):
-            mesh_or_scene.apply_transform(transform)
-            for i, mesh in enumerate(scene_to_trimeshes(mesh_or_scene)):
-                if material is not None and not isinstance(mesh.visual, trimesh.visual.texture.TextureVisuals):
-                    if material.color is not None:
-                        mesh.visual = trimesh.visual.ColorVisuals()
-                        mesh.visual.vertex_colors = material.color.rgba
-                    elif material.texture is not None:
-                        texture_path = self.resolve_ros_path(material.texture.filename)
-                        mesh.visual = trimesh.visual.texture.TextureVisuals(image=Image.open(str(texture_path)))
-                log_trimesh(self.add_entity_path_prefix(entity_path + f"/{i}"), mesh)
-        elif isinstance(mesh_or_scene, trimesh.Trimesh):
+        if isinstance(mesh_or_scene, trimesh.Trimesh):
             mesh = mesh_or_scene
             mesh.apply_transform(transform)
             if material is not None and not isinstance(mesh.visual, trimesh.visual.texture.TextureVisuals):
                 if material.color is not None:
                     mesh.visual = trimesh.visual.ColorVisuals()
                     mesh.visual.vertex_colors = material.color.rgba
-                elif material.texture is not None:
-                    texture_path = self.resolve_ros_path(material.texture.filename)
-                    mesh.visual = trimesh.visual.texture.TextureVisuals(image=Image.open(str(texture_path)))
-            log_trimesh(self.add_entity_path_prefix(entity_path), mesh)
+
+            final_entity_path = self.add_entity_path_prefix(entity_path)
+            log_trimesh(final_entity_path, mesh)
         else:
             logging.warning("Unexpected geometry type: %s", type(mesh_or_scene))
-            return
 
     def resolve_ros_path(self, path: str) -> Path:
         """Resolve a path relative to the URDF directory if not a package or file URI."""
@@ -170,11 +295,46 @@ class URDFLogger:
             parent_path = (self.urdf_dir.parent / path).resolve()
             if parent_path.exists():
                 return parent_path
-            # If we cannot find it, raise an error with a clear message
             raise FileNotFoundError(
                 f"Could not find file '{path}' relative to '{self.urdf_dir}' or its parent. "
                 "Please check that the file exists and is accessible."
             )
+
+    def print_final_link_transforms(self) -> None:
+        """Debug function: print accumulated joint transforms from root to each link.
+
+        For each link, accumulate the joint transforms from root -> link, then print the resulting final 4x4.
+        """
+        root_link = self.urdf.get_root()
+        logging.debug("\n========== FINAL ACCUMULATED TRANSFORMS PER LINK ==========")
+        for link in self.urdf.links:
+            if link.name == root_link:
+                logging.debug("Link '%s': Root link => final transform is identity.\n", link.name)
+                continue
+
+            chain = self.urdf.get_chain(root_link, link.name)
+            final_tf = np.eye(4, dtype=np.float64)
+            for i in range(1, len(chain), 2):
+                joint_name = chain[i]
+                j = None
+                for jt in self.urdf.joints:
+                    if jt.name == joint_name:
+                        j = jt
+                        break
+                if j is None:
+                    logging.debug("  (!) Could not find joint named '%s' in URDF?", joint_name)
+                    continue
+
+                xyz = j.origin.xyz if j.origin and j.origin.xyz else [0, 0, 0]
+                rpy = j.origin.rpy if j.origin and j.origin.rpy else [0, 0, 0]
+                local_rot = rotation_from_euler_xyz(rpy)
+                local_tf = np.eye(4, dtype=np.float64)
+                local_tf[:3, :3] = local_rot
+                local_tf[:3, 3] = xyz
+
+                final_tf = np.array(final_tf @ local_tf, dtype=np.float64)
+
+            debug_print_final_link_transform(link.name, chain, final_tf)
 
 
 def scene_to_trimeshes(scene: trimesh.Scene) -> list[trimesh.Trimesh]:
@@ -182,7 +342,7 @@ def scene_to_trimeshes(scene: trimesh.Scene) -> list[trimesh.Trimesh]:
 
     Skips objects that are not instances of trimesh.Trimesh.
     """
-    trimeshes = []
+    trimeshes: list[trimesh.Trimesh] = []
     scene_dump = scene.dump()
 
     if isinstance(scene_dump, list):
@@ -199,6 +359,7 @@ def scene_to_trimeshes(scene: trimesh.Scene) -> list[trimesh.Trimesh]:
 
 
 def log_trimesh(entity_path: str, mesh: trimesh.Trimesh) -> None:
+    """Log a single Trimesh to Rerun, with debug prints."""
     vertex_colors = albedo_texture = vertex_texcoords = None
 
     if isinstance(mesh.visual, trimesh.visual.color.ColorVisuals):
@@ -232,17 +393,23 @@ def log_trimesh(entity_path: str, mesh: trimesh.Trimesh) -> None:
         except Exception:
             pass
 
+    # --- CHANGED ---
+    # Prepare the rr.Mesh3D, then debug-print all the info in a helper function.
+    mesh3d_entity = rr.Mesh3D(
+        vertex_positions=mesh.vertices,
+        triangle_indices=mesh.faces,
+        vertex_normals=mesh.vertex_normals,
+        vertex_colors=vertex_colors,
+        albedo_texture=albedo_texture,
+        vertex_texcoords=vertex_texcoords,
+    )
+
+    timeless_val = True
+    debug_print_log_trimesh(entity_path, mesh3d_entity, timeless_val, mesh)
+
     rr.log(
-        entity_path,
-        rr.Mesh3D(
-            vertex_positions=mesh.vertices,
-            triangle_indices=mesh.faces,
-            vertex_normals=mesh.vertex_normals,
-            vertex_colors=vertex_colors,
-            albedo_texture=albedo_texture,
-            vertex_texcoords=vertex_texcoords,
-        ),
-        timeless=True,
+        entity_path=entity_path,
+        entity=mesh3d_entity,
     )
 
 
@@ -270,7 +437,8 @@ def main() -> None:
 
     filepath = Path(args.filepath).resolve()
     is_file = filepath.is_file()
-    is_urdf_file = ".urdf" in filepath.name
+    # Changed from the old code to handle uppercase/lowercase URDF:
+    is_urdf_file = ".urdf" in filepath.name.lower()
 
     if not is_file or not is_urdf_file:
         sys.exit(rr.EXTERNAL_DATA_LOADER_INCOMPATIBLE_EXIT_CODE)

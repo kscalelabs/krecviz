@@ -78,10 +78,9 @@ def update_robot_pose(
         if state.actuator_id in actuator_to_urdf_joint and state.position is not None:
             joint_name = actuator_to_urdf_joint[state.actuator_id]
             # Convert degrees to radians
-            angle_rad = np.deg2rad(float(state.position))
+            angle_rad = np.deg2rad(state.position)
             joint_angles[joint_name] = angle_rad
 
-    # Update each joint's transform
     for joint_name, angle in joint_angles.items():
         if joint_name not in joint_name_to_entity_path:
             logging.warning("No entity path found for joint %s", joint_name)
@@ -92,13 +91,21 @@ def update_robot_pose(
             logging.warning("Transform not found for path %s", full_path)
             continue
 
-        # Get initial transform and rotation axis
         translation, base_rotation = entity_to_transform[full_path]
-        axis = np.array([0, 0, 1])
-
-        # Compute new rotation (angle is already in radians)
+        axis = np.array([0, 0, 1])  # We assume rotation around Z-axis
         rot_mat = Rotation.from_rotvec(axis * angle).as_matrix()
         new_rotation = base_rotation @ rot_mat
+
+        # Debug-print the updated transform
+        debug_print_joint_update(
+            joint_name,
+            full_path,
+            np.rad2deg(angle),  # angle in degrees
+            angle,  # angle in radians
+            translation,
+            base_rotation,
+            new_rotation,
+        )
 
         # Log updated transform
         rr.log(
@@ -122,7 +129,7 @@ def log_frame_data(frame: krec.KRecFrame, frame_idx: int) -> None:
 
 
 def visualize_krec(
-    krec_path: Path | str,
+    krec_path: Path | str | None = None,
     urdf_path: Path | str | None = None,
     output_path: Path | str | None = None,
 ) -> None:
@@ -155,31 +162,34 @@ def visualize_krec(
         for joint in urdf_logger.urdf.joints:
             entity_path = urdf_logger.joint_entity_path(joint)
             joint_name_to_entity_path[joint.name] = entity_path
+    else:
+        raise RuntimeError("No URDF path provided!")
 
-    # Load KREC file
-    krec_data = load_krec(krec_path)
-    logging.info("Processing %d frames...", len(krec_data))
+    if krec_path:
+        # Load KREC file
+        krec_data = load_krec(krec_path)
+        logging.info("Processing %d frames...", len(krec_data))
 
-    # Process frames
-    try:
-        for idx, frame in enumerate(tqdm(krec_data, desc="Processing frames")):
-            if frame is not None:
-                log_frame_data(frame, idx)
-                if urdf_path:
-                    update_robot_pose(
-                        urdf_logger.entity_to_transform,
-                        frame.get_actuator_states(),
-                        joint_name_to_entity_path,
-                    )
+        # Process frames
+        try:
+            for idx, frame in enumerate(tqdm(krec_data, desc="Processing frames")):
+                if frame is not None:
+                    log_frame_data(frame, idx)
+                    if urdf_path:
+                        update_robot_pose(
+                            urdf_logger.entity_to_transform,
+                            frame.get_actuator_states(),
+                            joint_name_to_entity_path,
+                        )
 
-        if output_path:
-            logging.info("Saved animation to: %s", output_path)
-        else:
-            logging.info("Animation complete. Press Ctrl+C to exit.")
+            if output_path:
+                logging.info("Saved animation to: %s", output_path)
+            else:
+                logging.info("Animation complete. Press Ctrl+C to exit.")
 
-    except Exception as e:
-        logging.error("Error during animation: %s", e)
-        raise
+        except Exception as e:
+            logging.error("Error during animation: %s", e)
+            raise
 
 
 def main() -> None:
@@ -188,13 +198,11 @@ def main() -> None:
     parser.add_argument(
         "--urdf",
         type=Path,
-        default="data/urdf_examples/gpr/robot.urdf",
         help="Path to the URDF file of the robot.",
     )
     parser.add_argument(
         "--krec",
         type=Path,
-        default="data/krec_examples/actuator_22_right_arm_shoulder_roll_movement.krec",
         help="Input KREC file (either .krec or .krec.mkv).",
     )
     parser.add_argument("--output", type=Path, help="Output RRD file.")
@@ -204,6 +212,34 @@ def main() -> None:
     logging.basicConfig(level=logging.INFO)
 
     visualize_krec(args.krec, args.urdf, args.output)
+
+
+def debug_print_joint_update(
+    joint_name: str,
+    entity_path: str,
+    angle_deg: float,
+    angle_rad: float,
+    translation: list[float],
+    base_rotation: list[list[float]],
+    new_rotation: np.ndarray,
+) -> None:
+    """Print debug information when a joint transform is updated.
+
+    Mimics the style of the Rust debug-print helper.
+    """
+    logging.debug(
+        "Updating joint '%s' => entity_path='%s'",
+        joint_name,
+        entity_path,
+    )
+    logging.debug(
+        "  angle_deg=%.3f => angle_rad=%.3f",
+        angle_deg,
+        angle_rad,
+    )
+    logging.debug("  translation=%s", translation)
+    logging.debug("  base_rotation=%s", np.array(base_rotation))
+    logging.debug("  new_rotation=%s", new_rotation)
 
 
 if __name__ == "__main__":
